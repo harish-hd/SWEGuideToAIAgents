@@ -1,0 +1,27 @@
+graph LR
+    %% Define nodes
+    A[Input] --> B[Self-Attention]
+    B --> C[Add & Normalize]
+    C --> D[Feed-Forward Network]
+    D --> E[Add & Normalize]
+    E --> F[Output]
+
+    subgraph TransformerBlock["Transformer Block"]
+        direction TB
+        B
+        C
+        D
+        E
+    end 
+
+    %% Styling
+    classDef ioStyle fill:#f5f5f5,stroke:#333,stroke-width:2px,color:#000,font-size:18px;
+    classDef attentionStyle fill:#e8e8e8,stroke:#666,stroke-width:2px,color:#000,font-size:18px;
+    classDef normStyle fill:#d3d3d3,stroke:#999,stroke-width:2px,color:#000,font-size:18px;
+    classDef ffnStyle fill:#e0e0e0,stroke:#666,stroke-width:2px,color:#000,font-size:18px;
+
+    class A,F ioStyle;
+    class B attentionStyle;
+    class C,E normStyle;
+    class D ffnStyle;
+    style TransformerBlock fill:#fafafa,stroke:#333,stroke-width:3px; 

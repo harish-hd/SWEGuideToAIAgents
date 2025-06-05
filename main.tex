@@ -1,0 +1,139 @@
+\documentclass{book}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{geometry}
+\geometry{margin=1in} 
+\usepackage{caption}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{ragged2e} 
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{xcolor} 
+\usepackage{textcomp} 
+\usepackage[hidelinks,hypertexnames=false]{hyperref}
+\usepackage{svg}
+\usepackage{graphviz}
+\usepackage{biblatex}
+% Define some colors
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{codeblue}{rgb}{0,0,0.6}
+\definecolor{codegreen}{rgb}{0,0.5,0}
+
+\addbibresource{references.bib}  
+\lstdefinestyle{mystyle}{
+	backgroundcolor=\color{white},
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{codeblue},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\ttfamily\footnotesize,
+	breakatwhitespace=false,
+	breaklines=true,
+	captionpos=b,
+	keepspaces=true,
+	numbers=left,
+	numbersep=5pt,
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	tabsize=2,
+	frame=single, 
+	framerule=0.3pt, % Thickness of the frame rule
+	rulecolor=\color{black}, 
+	aboveskip=1em, 
+	belowskip=1em, 
+	postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}, 
+	columns=flexible 
+}
+
+\lstset{style=mystyle}
+
+
+\titleformat{\chapter}[display]
+{\normalfont\huge\bfseries\centering}
+{\chaptertitlename\ \thechapter}
+{18pt}
+{\Huge}
+
+\titleformat{\section}
+{\normalfont\Large\bfseries}
+{\thesection}
+{1em}
+{}
+
+\titleformat{\subsection}
+{\normalfont\large\bfseries}
+{\thesubsection}
+{1em}
+{}
+
+
+\pagestyle{fancy}
+\fancyhf{} 
+\fancyhead[RO]{Software Engineer's Guide to AI Agents}
+\fancyhead[LE]{\slshape\nouppercase{\leftmark}} % Chapter title on even pages (left)
+\fancyfoot[CE,CO]{\thepage} % Page numbers centered
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\begin{document}
+
+	\begin{titlepage}
+		\centering
+		\includegraphics[width=0.8\textwidth]{diagrams/cover.png}
+	\end{titlepage}
+	
+	\begin{center}
+		\vspace*{1cm}
+		{\Huge\bfseries Software Engineer's Guide to AI Agents\par}
+		\vspace{1cm}
+		{\Large\itshape by\par}
+		\vspace{1cm}
+		{\Large Harish Kumar Dasari\par}
+	\end{center}
+
+	\frontmatter
+	\tableofcontents
+	
+	\mainmatter
+	
+	\part{Foundations of Large Language Models for Software Engineers}
+	
+	\input{chapter1}
+
+	\part{LLMs in Action: Tools and Agents}
+	
+	\input{chapter2}
+	
+	\input{chapter3}
+	
+	\input{chapter4}
+	
+	\input{chapter5}
+	
+	\input{chapter6}
+	
+	\part{Engineering Agentic Systems with MCP and A2A}
+	
+	\input{chapter7}
+	
+	\input{chapter8}
+	
+	\part{Real-World Applications and Advanced Considerations}
+	
+	\input{chapter9}
+
+	\part{ Conclusion and Future Directions}
+	\input{chapter10}
+	
+	\begin{refsection}
+		\nocite{*} 
+		\printbibliography[title={References}]
+	\end{refsection}
+
+\end{document}

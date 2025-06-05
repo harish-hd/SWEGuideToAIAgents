@@ -1,0 +1,28 @@
+graph LR
+    %% Define nodes
+    A[Request] --> B[Agent Core]
+    B --> C{Decision}
+    C --> D[Execute]
+    D --> H[Output]
+    C --> E[Pause]
+    E --> F[Review]
+    F --> G[Resume]
+    G --> D
+    G --> B
+    F --> I[Feedback]
+    I --> J[Learning]
+
+    subgraph Human_Loop["Human Loop"]
+        E
+        F
+        G
+    end 
+
+    %% Styling
+    classDef defaultStyle fill:#d3d3d3,stroke:#999,stroke-width:2px,color:#000,font-size:18px;
+    classDef decisionStyle fill:#e8e8e8,stroke:#666,stroke-width:2px,color:#000,font-size:18px;
+    classDef loopStyle fill:#fafafa,stroke:#333,stroke-width:3px;
+
+    class A,B,D,E,F,G,H,I,J defaultStyle;
+    class C decisionStyle;
+    style Human_Loop fill:#fafafa,stroke:#333,stroke-width:3px; 

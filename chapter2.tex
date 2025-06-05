@@ -1,0 +1,100 @@
+% Chapter 2: LLMs as Tool Users: Extending Capabilities
+\chapter{LLMs as Tool Users: Extending Capabilities}
+
+While LLMs possess remarkable abilities in understanding and generating text, their knowledge is inherently limited by their training data, 
+which has a specific cutoff point in time. They also lack the ability to perform precise calculations reliably or interact directly with the external world, 
+such as accessing live databases or triggering actions in other software systems. "Tool use," often implemented via "function calling," is a 
+mechanism that allows LLMs to overcome these limitations by integrating with external functions, APIs, and data sources.
+
+\section{The Concept of Tool Use (Function Calling)}
+
+The core idea behind LLM tool use is to enable the model to request the execution of predefined functions when it determines that doing so would help 
+fulfill a user's request or achieve a given task. Instead of trying to generate an answer based solely on its internal knowledge, the LLM can recognize when it needs, 
+for example, current weather information, the result of a mathematical calculation, or data from a specific enterprise API.
+
+Function Calling is the common term for how this is implemented. In this paradigm, LLMs like GPT-4 have been fine-tuned to detect when a function call is necessary 
+and to output a structured data object, typically in JSON format, that specifies the name of the function to be called and the arguments to pass to it. 
+Crucially, the LLM itself does not execute the function. Instead, it acts as a "reasoner" or "router," deciding which tool (function) is appropriate for 
+the current context and what inputs that tool needs. The actual execution of the function is handled by the application code that is interacting with the LLM.
+
+This capability represents a fundamental architectural pattern for building LLM-powered applications. It allows software engineers to create a powerful synergy 
+by combining the natural language understanding and reasoning strengths of LLMs with the deterministic, precise, and specialized capabilities of existing software 
+tools and APIs. Each component in this architecture focuses on what it does best: the LLM interprets intent and plans the use of tools, while traditional software 
+components execute those tools and provide factual results. This separation of concerns is key to building robust, extensible, and reliable LLM-integrated systems.
+
+\section{How LLMs Interact with External APIs and Functions}
+
+The interaction between an LLM and an external tool or API typically follows a well-defined workflow:
+
+\begin{enumerate}[label=\arabic*.]
+    \item \textbf{User Query to LLM:} The process starts with a user providing a query or instruction to the LLM-powered application.
+    \item \textbf{LLM Processing and Tool Selection:} The LLM analyzes the query. If it determines that an external tool is needed to fulfill the request, 
+    it generates a structured output (e.g., a JSON object) that specifies the function to be called and the necessary arguments. For example, if the user asks, 
+    "What's the weather like in London?", the LLM might output:
+	\begin{lstlisting}[ caption=Example LLM output for tool selection, basicstyle=\ttfamily\footnotesize\linespread{0.9}, breaklines=true]
+		{
+			"tool_name": "get_weather",
+			"arguments": {
+				"city": "London",
+				"unit": "celsius"
+			}
+		}
+	\end{lstlisting}
+    \item \textbf{Application Code Receives Request:} The application code that hosts the LLM receives this structured request.
+    \item \textbf{Function Execution by Application:} The application code then parses this request and executes the actual \texttt{get\_weather} function 
+    (which might involve calling an external weather API) with the provided arguments ("London", "celsius").
+    \item \textbf{Result Returned to LLM:} The result from the executed function (e.g., "The weather in London is 15°C and cloudy") is then sent back to the 
+    LLM, typically as part of a new prompt or context.
+    \item \textbf{LLM Formulates Final Response:} The LLM uses this new information (the tool's output) to formulate a natural language response to the user's 
+    original query (e.g., "The current weather in London is 15 degrees Celsius and cloudy.").
+\end{enumerate}
+
+To make the LLM "aware" of the available tools and how to use them, developers provide descriptions or schemas of these tools as part of the initial prompt or 
+system message to the LLM. These descriptions detail what each tool does, the parameters it expects (including their names, types, and purpose), and sometimes 
+even examples of how to use it.
+
+The quality of these tool descriptions is critical. They act as an "API contract" for the LLM. A clear, accurate, and unambiguous description directly impacts 
+the LLM's ability to correctly choose the right tool and provide the correct arguments. If the description is vague or misleading, the LLM is likely to make 
+errors in its function call requests, leading to application failures or incorrect results. Therefore, crafting effective tool descriptions is a new and important 
+skill for software engineers building LLM applications, akin to designing good API documentation for human developers.
+
+\section{Practical Examples of LLM Tool Integration}
+
+The ability of LLMs to use tools unlocks a vast range of practical applications, making them significantly more useful in real-world business scenarios. Some 
+common examples include:
+
+\subsection*{Retrieving Real-Time Information}
+LLMs have knowledge cutoffs, meaning their training data only goes up to a certain point in time. Tools allow them to access current information.
+\begin{itemize}
+    \item \textbf{Example:} A user asks, "What's the current stock price for Company X?" The LLM can use a \texttt{get\_stock\_price} tool that calls a financial
+     markets API to fetch the latest price.
+    \item \textbf{Example:} Answering questions about today's news or weather forecasts.
+\end{itemize}
+
+\subsection*{Interacting with Databases}
+LLMs can use tools to query and retrieve data from various databases.
+\begin{itemize}
+    \item \textbf{Example:} A customer service LLM might use a \texttt{get\_customer\_order\_status} tool that queries a CRM or order management system database 
+    based on a customer's ID or order number.
+\end{itemize}
+
+\subsection*{Performing Actions}
+Tools can enable LLMs to trigger actions in other systems.
+\begin{itemize}
+    \item \textbf{Example:} A personal assistant LLM could use a \texttt{send\_email} tool to draft and send an email based on user instructions, or a 
+    \texttt{schedule\_meeting} tool to interact with a calendar API.
+    \item \textbf{Example:} An LLM could use a tool to pay a bill through a financial service API.
+\end{itemize}
+
+\subsection*{Using Computational Tools}
+LLMs are not inherently strong at precise mathematical calculations. Tools can offload these tasks to specialized engines.
+\begin{itemize}
+    \item \textbf{Example:} For a query like "What is 25\% of 789?", the LLM can call a calculator tool or even a more advanced computational engine like WolframAlpha.
+\end{itemize}
+
+\subsection*{Connecting with Enterprise Systems}
+LLMs can integrate with internal business applications, such as CRMs, ERPs, or proprietary knowledge bases, via tools that wrap these systems' APIs. 
+This allows LLMs to provide contextually relevant information based on specific company data.
+
+By connecting LLMs to live data streams and actionable systems, tool use transforms them from sophisticated text generators into versatile components 
+capable of participating actively in business processes and information workflows. 

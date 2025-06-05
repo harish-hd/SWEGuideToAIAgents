@@ -1,0 +1,61 @@
+graph LR
+    %% External entities
+    Client["Client<br/>Application"]
+    External["External<br/>Services"]
+    
+    %% Main server container
+    subgraph MCP_Server ["FastAPI MCP Server"]
+        direction TB
+        
+        subgraph Row1 [" "]
+            Entry["Request<br/>Handler"]
+            Parser["JSON-RPC<br/>Parser"]
+        end
+        
+        subgraph Row2 [" "]
+            Validator["Request<br/>Validator"]
+            Router["Tool<br/>Router"]
+        end
+        
+        subgraph Row3 [" "]
+            Handler["Tool<br/>Handler"]
+            Logic["Business<br/>Logic"]
+        end
+        
+        subgraph Row4 [" "]
+            Formatter["Response<br/>Formatter"]
+            Serializer["JSON-RPC<br/>Serializer"]
+        end
+        
+        %% Internal flow
+        Entry --> Parser
+        Parser --> Validator
+        Validator --> Router
+        Router --> Handler
+        Handler --> Logic
+        Logic --> Formatter
+        Formatter --> Serializer
+        Serializer --> Entry
+    end
+    
+    %% External connections
+    Client -->|"MCP Request<br/>(JSON-RPC)"| Entry
+    Entry -->|"MCP Response<br/>(JSON-RPC)"| Client
+    Logic -.->|"API Calls"| External
+    
+    %% Styling for grayscale and larger text
+    classDef clientStyle fill:#f5f5f5,stroke:#333,stroke-width:2px,color:#000,font-size:18px
+    classDef serverStyle fill:#e8e8e8,stroke:#666,stroke-width:2px,color:#000,font-size:18px
+    classDef internalStyle fill:#d3d3d3,stroke:#999,stroke-width:2px,color:#000,font-size:18px
+    classDef externalStyle fill:#f0f0f0,stroke:#333,stroke-width:2px,color:#000,font-size:18px
+    
+    class Client,External clientStyle
+    class Entry serverStyle
+    class Parser,Validator,Router,Handler,Logic,Formatter,Serializer internalStyle
+    
+    %% Subgraph styling
+    style MCP_Server fill:#fafafa,stroke:#333,stroke-width:3px
+    style Row1 fill:none,stroke:none
+    style Row2 fill:none,stroke:none
+    style Row3 fill:none,stroke:none
+    style Row4 fill:none,stroke:none
