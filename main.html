@@ -1,0 +1,3284 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Software Engineer's Guide to AI Agents</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    /* CSS for citations */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+    }
+    .hanging-indent div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Software Engineer's Guide to AI Agents</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a
+href="#foundations-of-large-language-models-for-software-engineers"
+id="toc-foundations-of-large-language-models-for-software-engineers">Foundations
+of Large Language Models for Software Engineers</a>
+<ul>
+<li><a href="#introduction-to-llms-beyond-the-hype"
+id="toc-introduction-to-llms-beyond-the-hype">Introduction to LLMs:
+Beyond the Hype</a>
+<ul>
+<li><a href="#what-are-llms-a-software-engineers-perspective"
+id="toc-what-are-llms-a-software-engineers-perspective">What are LLMs? A
+Software Engineer’s Perspective</a></li>
+<li><a href="#core-concepts-input-output-and-tokens"
+id="toc-core-concepts-input-output-and-tokens">Core Concepts: Input,
+Output, and Tokens</a></li>
+<li><a href="#a-glimpse-inside-simplified-llm-internals"
+id="toc-a-glimpse-inside-simplified-llm-internals">A Glimpse Inside:
+Simplified LLM Internals</a></li>
+<li><a href="#llms-and-data-the-role-of-gpus-in-processing"
+id="toc-llms-and-data-the-role-of-gpus-in-processing">LLMs and Data: The
+Role of GPUs in Processing</a></li>
+<li><a href="#understanding-transformers-the-engine-of-llms"
+id="toc-understanding-transformers-the-engine-of-llms">Understanding
+Transformers: The Engine of LLMs</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#llms-in-action-tools-and-agents"
+id="toc-llms-in-action-tools-and-agents">LLMs in Action: Tools and
+Agents</a>
+<ul>
+<li><a href="#llms-as-tool-users-extending-capabilities"
+id="toc-llms-as-tool-users-extending-capabilities">LLMs as Tool Users:
+Extending Capabilities</a>
+<ul>
+<li><a href="#the-concept-of-tool-use-function-calling"
+id="toc-the-concept-of-tool-use-function-calling">The Concept of Tool
+Use (Function Calling)</a></li>
+<li><a href="#how-llms-interact-with-external-apis-and-functions"
+id="toc-how-llms-interact-with-external-apis-and-functions">How LLMs
+Interact with External APIs and Functions</a></li>
+<li><a href="#practical-examples-of-llm-tool-integration"
+id="toc-practical-examples-of-llm-tool-integration">Practical Examples
+of LLM Tool Integration</a></li>
+</ul></li>
+<li><a href="#introducing-llm-agents-autonomous-problem-solvers"
+id="toc-introducing-llm-agents-autonomous-problem-solvers">Introducing
+LLM Agents: Autonomous Problem Solvers</a>
+<ul>
+<li><a href="#what-are-llm-agents-a-human-analogy"
+id="toc-what-are-llm-agents-a-human-analogy">What are LLM Agents? A
+Human Analogy</a></li>
+<li><a href="#key-components-llm-core-memory-planning-and-tools"
+id="toc-key-components-llm-core-memory-planning-and-tools">Key
+Components: LLM Core, Memory, Planning, and Tools</a></li>
+<li><a href="#reasoning-and-decision-making-in-agents"
+id="toc-reasoning-and-decision-making-in-agents">Reasoning and
+Decision-Making in Agents</a></li>
+</ul></li>
+<li><a
+href="#model-context-protocol-mcp-standardizing-agent-tool-interaction"
+id="toc-model-context-protocol-mcp-standardizing-agent-tool-interaction">Model
+Context Protocol (MCP): Standardizing Agent-Tool Interaction</a>
+<ul>
+<li><a href="#the-why-rationale-for-mcp-in-software-engineering"
+id="toc-the-why-rationale-for-mcp-in-software-engineering">The "Why":
+Rationale for MCP in Software Engineering</a></li>
+<li><a
+href="#mcp-explained-core-concepts-and-architecture-client-host-server"
+id="toc-mcp-explained-core-concepts-and-architecture-client-host-server">MCP
+Explained: Core Concepts and Architecture (Client-Host-Server)</a></li>
+<li><a href="#benefits-of-mcp-for-building-robust-agentic-services"
+id="toc-benefits-of-mcp-for-building-robust-agentic-services">Benefits
+of MCP for Building Robust Agentic Services</a></li>
+</ul></li>
+<li><a href="#agent-to-agent-a2a-protocol-enabling-collaborative-ai"
+id="toc-agent-to-agent-a2a-protocol-enabling-collaborative-ai">Agent-to-Agent
+(A2A) Protocol: Enabling Collaborative AI</a>
+<ul>
+<li><a href="#the-need-for-inter-agent-communication"
+id="toc-the-need-for-inter-agent-communication">The Need for Inter-Agent
+Communication</a></li>
+<li><a href="#a2a-explained-core-concepts-and-architecture"
+id="toc-a2a-explained-core-concepts-and-architecture">A2A Explained:
+Core Concepts and Architecture</a></li>
+<li><a href="#mcp-and-a2a-complementary-protocols-for-complex-systems"
+id="toc-mcp-and-a2a-complementary-protocols-for-complex-systems">MCP and
+A2A: Complementary Protocols for Complex Systems</a></li>
+</ul></li>
+<li><a href="#practical-implementation-mcpa2a-with-fastapi"
+id="toc-practical-implementation-mcpa2a-with-fastapi">Practical
+Implementation: MCP/A2A with FastAPI</a>
+<ul>
+<li><a href="#setting-up-a-fastapi-environment-for-agentic-services"
+id="toc-setting-up-a-fastapi-environment-for-agentic-services">Setting
+up a FastAPI Environment for Agentic Services</a></li>
+<li><a href="#building-an-mcp-server-with-fastapi-a-code-walkthrough"
+id="toc-building-an-mcp-server-with-fastapi-a-code-walkthrough">Building
+an MCP Server with FastAPI: A Code Walkthrough</a></li>
+<li><a href="#illustrative-block-diagram-of-the-fastapi-mcp-service"
+id="toc-illustrative-block-diagram-of-the-fastapi-mcp-service">Illustrative
+Block Diagram of the FastAPI MCP Service</a></li>
+<li><a
+href="#exposing-a2a-endpoints-with-fastapi-conceptual-overview-block-diagram"
+id="toc-exposing-a2a-endpoints-with-fastapi-conceptual-overview-block-diagram">Exposing
+A2A Endpoints with FastAPI (Conceptual Overview &amp; Block
+Diagram)</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#engineering-agentic-systems-with-mcp-and-a2a"
+id="toc-engineering-agentic-systems-with-mcp-and-a2a">Engineering
+Agentic Systems with MCP and A2A</a>
+<ul>
+<li><a href="#integrating-existing-business-services-with-mcp"
+id="toc-integrating-existing-business-services-with-mcp">Integrating
+Existing Business Services with MCP</a>
+<ul>
+<li><a
+href="#patterns-for-wrapping-business-logic-as-mcp-toolsresources"
+id="toc-patterns-for-wrapping-business-logic-as-mcp-toolsresources">Patterns
+for Wrapping Business Logic as MCP Tools/Resources</a></li>
+<li><a href="#case-study-exposing-an-internal-crm-api-via-an-mcp-server"
+id="toc-case-study-exposing-an-internal-crm-api-via-an-mcp-server">Case
+Study: Exposing an Internal CRM API via an MCP Server</a></li>
+</ul></li>
+<li><a href="#llm-agents-solving-business-problems"
+id="toc-llm-agents-solving-business-problems">LLM Agents Solving
+Business Problems</a>
+<ul>
+<li><a href="#examples-from-various-industries"
+id="toc-examples-from-various-industries">Examples from Various
+Industries</a></li>
+<li><a href="#designing-agents-for-specific-business-outcomes"
+id="toc-designing-agents-for-specific-business-outcomes">Designing
+Agents for Specific Business Outcomes</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#real-world-applications-and-advanced-considerations"
+id="toc-real-world-applications-and-advanced-considerations">Real-World
+Applications and Advanced Considerations</a>
+<ul>
+<li><a href="#human-in-the-loop-hitl-ensuring-reliability-and-control"
+id="toc-human-in-the-loop-hitl-ensuring-reliability-and-control">Human-in-the-Loop
+(HITL): Ensuring Reliability and Control</a>
+<ul>
+<li><a href="#the-importance-of-hitl-in-agentic-systems"
+id="toc-the-importance-of-hitl-in-agentic-systems">The Importance of
+HITL in Agentic Systems</a></li>
+<li><a href="#common-hitl-workflow-patterns"
+id="toc-common-hitl-workflow-patterns">Common HITL Workflow
+Patterns</a></li>
+<li><a
+href="#implementing-hitl-in-your-agentic-applications-with-block-diagram"
+id="toc-implementing-hitl-in-your-agentic-applications-with-block-diagram">Implementing
+HITL in Your Agentic Applications (with Block Diagram)</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#conclusion-and-future-directions"
+id="toc-conclusion-and-future-directions"> Conclusion and Future
+Directions</a>
+<ul>
+<li><a href="#the-evolving-landscape-of-agentic-ai"
+id="toc-the-evolving-landscape-of-agentic-ai">The Evolving Landscape of
+Agentic AI</a>
+<ul>
+<li><a href="#summary-of-key-learnings"
+id="toc-summary-of-key-learnings">Summary of Key Learnings</a></li>
+<li><a href="#current-challenges-and-limitations-in-agentic-systems"
+id="toc-current-challenges-and-limitations-in-agentic-systems">Current
+Challenges and Limitations in Agentic Systems</a></li>
+<li><a href="#future-trends-the-open-agentic-web-and-beyond"
+id="toc-future-trends-the-open-agentic-web-and-beyond">Future Trends:
+The Open Agentic Web and Beyond</a></li>
+<li><a
+href="#ethical-considerations-and-best-practices-for-responsible-development"
+id="toc-ethical-considerations-and-best-practices-for-responsible-development">Ethical
+Considerations and Best Practices for Responsible Development</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+<div class="titlepage">
+<p><img src="diagrams/cover.png" style="width:80.0%" alt="image" /></p>
+</div>
+<div class="center">
+<p><strong>Software Engineer’s Guide to AI Agents</strong></p>
+<p><em>by</em></p>
+<p>Harish Kumar Dasari</p>
+</div>
+<h1
+id="foundations-of-large-language-models-for-software-engineers">Foundations
+of Large Language Models for Software Engineers</h1>
+<h2 id="introduction-to-llms-beyond-the-hype">Introduction to LLMs:
+Beyond the Hype</h2>
+<p>Large Language Models (LLMs) have rapidly moved from research labs to
+practical applications, capturing the imagination of technologists and
+the public alike. For software engineers, LLMs represent a new class of
+powerful tools and components that can be integrated into systems to
+solve complex problems, automate tasks, and create novel user
+experiences. This chapter aims to demystify LLMs, providing a
+foundational understanding geared specifically towards software
+engineering perspectives and applications.</p>
+<h3 id="what-are-llms-a-software-engineers-perspective">What are LLMs? A
+Software Engineer’s Perspective</h3>
+<p>At its core, a Large Language Model is an advanced type of artificial
+intelligence algorithm specifically designed to understand, generate,
+and manipulate human language on a large scale. These models are trained
+on vast quantities of text data, enabling them to produce coherent and
+contextually relevant responses to a wide array of prompts. It’s crucial
+for software engineers to view LLMs not as sentient entities possessing
+genuine understanding, but as sophisticated pattern-matching and
+generation engines. Their ability to recognize, summarize, translate,
+predict, and generate content makes them powerful components within
+larger software systems.</p>
+<p>The utility of LLMs extends beyond just human language. They can be
+applied to other "languages" or scenarios where communication of
+different types is needed, such as understanding protein and molecular
+sequences in biology or, more directly relevant to software engineers,
+generating and understanding software code.</p>
+<p>A fundamental characteristic that engineers must grasp is that LLMs
+operate on principles of probability, not on a basis of truth or genuine
+comprehension. They predict "what word should come next" to produce
+fluent text, but they do not inherently understand the reality of what
+they describe. This probabilistic nature means their outputs are
+generations based on learned patterns. This makes them highly effective
+for tasks like code generation or text summarization, which benefit from
+strong pattern recognition and fluent output. However, it also implies
+that their outputs may require external verification or grounding,
+especially when factual accuracy is critical. This understanding is
+paramount for designing robust software systems that leverage LLMs, as
+it necessitates incorporating mechanisms for validation, error handling,
+and potentially human oversight in critical applications.</p>
+<h3 id="core-concepts-input-output-and-tokens">Core Concepts: Input,
+Output, and Tokens</h3>
+<p>Interacting with an LLM involves several core concepts that software
+engineers need to understand to effectively harness their
+capabilities.</p>
+<h4 class="unnumbered" id="input-prompt">Input ("Prompt")</h4>
+<p>The process begins when a user or a system provides text input to the
+LLM. This input is commonly referred to as a "prompt". The prompt serves
+as the instruction or the context based on which the LLM will generate a
+response. For software engineers, crafting effective prompts—a practice
+known as prompt engineering—is a key skill for guiding the LLM to
+produce desired outputs.</p>
+<h4 class="unnumbered" id="output-generation">Output ("Generation")</h4>
+<p>Based on the input prompt and the patterns it has learned during
+training, the LLM generates an output, typically in the form of text.
+This output is often called a "generation." The quality and relevance of
+the generation depend heavily on the prompt, the model’s training, and
+various configurable parameters.</p>
+<h4 class="unnumbered" id="tokens">Tokens</h4>
+<p>LLMs don’t process text as whole words or characters directly.
+Instead, they break down text into smaller units called "tokens". A
+token can be a word, a part of a word (sub-word), or even a single
+character, depending on the specific tokenization scheme used by the
+model. For software engineers, understanding tokens is important because
+API costs for many commercial LLMs are based on the number of tokens
+processed (both input and output). Additionally, LLMs have maximum token
+limits for their input context and output generation, which can
+influence how applications are designed.</p>
+<h4 class="unnumbered" id="parameters-model-weights">Parameters (Model
+Weights)</h4>
+<p>LLMs possess millions, or even billions, of "parameters". These
+parameters are essentially the weights and biases within the model’s
+neural network that are learned during the training process. They
+collectively define the model’s behavior and its ability to understand
+language patterns and generate human-like text. Generally, a higher
+number of parameters correlates with greater model capability but also
+demands more computational resources for training and inference.</p>
+<h4 class="unnumbered" id="temperature">Temperature</h4>
+<p>This is a crucial parameter that engineers can control when
+generating text with an LLM. Temperature influences the randomness of
+the LLM’s output. A lower temperature (e.g., 0.0 to 0.3) makes the
+output more deterministic and focused; the LLM will tend to pick the
+most probable next token. This is useful for tasks requiring factual
+accuracy or predictable outputs, like code generation or direct question
+answering. A higher temperature (e.g., 0.7 to 1.0 or higher) results in
+more random, creative, and diverse outputs, as the LLM is more likely to
+choose less probable tokens. This can be beneficial for creative writing
+or brainstorming but may also increase the likelihood of generating
+nonsensical or irrelevant responses. Finding the right temperature
+setting is often a matter of experimentation based on the specific
+application needs.</p>
+<p>Grasping these concepts allows software engineers to move beyond
+treating LLMs as black boxes. Tokenization, parameter counts, and
+especially temperature are practical levers for controlling LLM
+behavior, managing API costs, and optimizing the performance and
+predictability of LLM-integrated applications.</p>
+<h3 id="a-glimpse-inside-simplified-llm-internals">A Glimpse Inside:
+Simplified LLM Internals</h3>
+<p>While a deep dive into the mathematical intricacies of LLMs is beyond
+the scope of this book, a simplified understanding of their internal
+workings is beneficial for software engineers. LLMs learn from immense
+volumes of text data through a process often involving unsupervised
+learning. During this phase, the model is not given explicit
+instructions on what to do with the data but rather learns to identify
+patterns, structures, and relationships between words and concepts
+embedded within the text.</p>
+<p>The fundamental mechanism by which most LLMs operate is "next token
+prediction". Given a sequence of input tokens, the model calculates the
+probability distribution for all possible next tokens in its vocabulary
+and then selects one (or samples from the distribution) to continue the
+sequence. T his process is repeated, with each newly generated token
+being added to the input sequence for predicting the subsequent token,
+allowing the LLM to generate coherent and contextually relevant text
+autoregressively.</p>
+<p>The development of an LLM typically involves two main stages:</p>
+<ul>
+<li><p><strong>Pre-training:</strong> This is where the model learns
+general language understanding from a massive, diverse corpus of text
+data (e.g., books, articles, websites). The goal is to build a
+foundational understanding of language, grammar, common knowledge, and
+reasoning abilities.</p></li>
+<li><p><strong>Fine-tuning:</strong> After pre-training, a model can be
+further trained on a smaller, more specific dataset to adapt its
+capabilities to a particular task or domain. For example, a general
+pre-trained model can be fine-tuned on a dataset of medical research
+papers to specialize in medical language, or on a corpus of code to
+improve its code generation abilities. Fine-tuning can also adjust the
+model’s tone, style, or factual knowledge.</p></li>
+</ul>
+<p>The seemingly intelligent outputs of LLMs, such as their ability to
+generate working code, refactor existing code , or engage in complex
+dialogue, all stem from this core probabilistic "next token prediction"
+mechanism. This understanding is vital for engineers when debugging
+unexpected model outputs or so-called "hallucinations." Hallucinations,
+where an LLM generates incorrect or fabricated information despite
+sounding plausible , are not entirely random errors. They can be seen as
+logical outcomes of the probabilistic generation process when the input
+prompt is ambiguous, poorly constrained, or leads the model into areas
+of the learned pattern-space that were sparsely represented in its
+training data. Recognizing this helps in developing better prompt
+engineering strategies and in designing systems that can validate or
+provide corrective feedback for LLM outputs, especially in critical
+applications.</p>
+<h3 id="llms-and-data-the-role-of-gpus-in-processing">LLMs and Data: The
+Role of GPUs in Processing</h3>
+<p>The computational demands of training and running Large Language
+Models are substantial, and Graphics Processing Units (GPUs) play a
+critical role in handling these intensive workloads. LLM computations,
+particularly during the training and inference (generation) phases, are
+heavily dominated by matrix-matrix multiplication operations. GPUs, with
+their massively parallel architecture, are exceptionally well-suited for
+performing these types of calculations far more efficiently than
+traditional CPUs.</p>
+<p>A key factor in LLM performance on GPUs, especially during inference,
+is memory bandwidth. While computational power (measured in FLOPS -
+Floating Point Operations Per Second) is important, the speed at which
+data (model parameters, intermediate calculations) can be moved between
+the GPU’s main memory (VRAM) and its compute units often becomes the
+bottleneck, particularly for the decoding phase of text generation. This
+means that simply having a GPU with high FLOPS might not guarantee the
+best performance if its memory bandwidth is insufficient for the model’s
+size and the desired batching strategy.</p>
+<p>LLM text generation typically involves a two-step process on GPUs
+:</p>
+<ul>
+<li><p><strong>Prefill (Prompt Processing):</strong> When a prompt is
+first given to the LLM, the tokens in this input prompt are processed in
+parallel by the GPU. This phase is generally compute-bound.</p></li>
+<li><p><strong>Decoding (Token Generation):</strong> After the initial
+prompt processing, text is generated one token at a time in an
+autoregressive manner. Each newly generated token is appended to the
+input sequence and fed back into the model to produce the next token.
+This phase is often memory-bandwidth-bound.</p></li>
+</ul>
+<p>To optimize these processes, several techniques are employed:</p>
+<ul>
+<li><p><strong>KV Caching (Key-Value Caching):</strong> During the
+autoregressive decoding phase, the attention mechanism (discussed in the
+next section) needs to consider all previously generated tokens. Without
+optimization, this would involve significant re-computation. KV caching
+addresses this by saving the intermediate "key" and "value" states from
+the attention layers for previously processed tokens. These cached
+values are then reused in subsequent token generation steps, avoiding
+redundant calculations and significantly speeding up the decoding
+process. Effective management of the KV cache memory is crucial for good
+inference performance.</p></li>
+<li><p><strong>Quantization:</strong> This technique involves reducing
+the numerical precision of the model’s parameters (weights). For
+example, parameters might be converted from 32-bit floating-point (FP32)
+or 16-bit floating-point (FP16) to 8-bit integers (INT8) or even 4-bit
+integers (INT4). Smaller data types mean the model takes up less VRAM
+and, critically, less data needs to be moved between memory and compute
+units, which can speed up inference, especially in
+memory-bandwidth-bound scenarios. However, quantization can sometimes
+lead to a slight degradation in model accuracy, so a balance must be
+struck.</p></li>
+</ul>
+<p>For software engineers involved in deploying or managing LLM
+applications, understanding these GPU processing characteristics is
+vital. It informs choices about hardware selection, model optimization
+strategies (like quantization), batching techniques for requests, and
+overall system architecture to achieve desired performance targets (like
+Time To First Token (TTFT) and Time Per Output Token (TPOT) ) and manage
+operational costs effectively.</p>
+<h3 id="understanding-transformers-the-engine-of-llms">Understanding
+Transformers: The Engine of LLMs</h3>
+<p>The vast majority of modern Large Language Models, including
+well-known ones like GPT, LLaMa, and Claude, are built upon a neural
+network architecture called the Transformer. Introduced in a 2017 paper
+titled "Attention is All You Need" , the Transformer architecture
+revolutionized natural language processing by providing a more effective
+way to handle sequential data, like text, compared to previous
+architectures such as Recurrent Neural Networks (RNNs) and Long
+Short-Term Memory (LSTMs) networks.</p>
+<p>For software engineers, having a conceptual understanding of the
+Transformer’s key components is beneficial for appreciating why LLMs are
+so powerful and how they fundamentally operate, without needing to delve
+into the deepest mathematical details.</p>
+<h4 class="unnumbered"
+id="key-components-of-the-transformer-architecture">Key Components of
+the Transformer Architecture</h4>
+<ul>
+<li><p><strong>Input Embeddings and Tokenization:</strong> As discussed
+earlier, input text is first broken down into tokens. Each token is then
+converted into a numerical vector called an "embedding". These
+embeddings represent the tokens in a high-dimensional space where tokens
+with similar meanings or contexts are located closer to each other. This
+numerical representation is what the model actually processes.</p></li>
+<li><p><strong>Positional Encoding:</strong> Unlike RNNs that process
+tokens sequentially, Transformers can process all tokens in an input
+sequence in parallel. This parallelism is a key to their efficiency but
+means the model doesn’t inherently know the order of the tokens.
+Positional encoding solves this by adding information to each token’s
+embedding that indicates its position within the sequence. This allows
+the model to understand and utilize word order, which is crucial for
+language comprehension.</p></li>
+<li><p><strong>Self-Attention Mechanism:</strong> This is arguably the
+most critical innovation of the Transformer. The self-attention
+mechanism allows the model, when processing a particular token, to look
+at all other tokens in the input sequence and weigh their importance or
+relevance to the current token. In essence, each token calculates an
+"attention score" with every other token in the sequence. These scores
+determine how much "focus" or "attention" to pay to other tokens when
+generating a representation for itself. This allows the model to capture
+long-range dependencies and contextual relationships between words, no
+matter how far apart they are in the sequence. For example, in the
+sentence "The cat didn’t chase the mouse, because it was not hungry,"
+self-attention helps the model understand that "it" refers to
+"cat".</p></li>
+<li><p><strong>Multi-Head Attention:</strong> Instead of performing
+self-attention just once, Transformers use "multi-head" attention. This
+means the self-attention mechanism is run multiple times in parallel,
+with each "head" learning different types of relationships or focusing
+on different aspects of the input sequence. The outputs from these
+multiple heads are then combined, allowing the model to capture a richer
+and more diverse set of contextual information.</p></li>
+<li><p><strong>Feed-Forward Networks (FFN):</strong> After the attention
+mechanism has processed the tokens and incorporated contextual
+information, each token’s representation is passed through a
+position-wise Feed-Forward Network. This FFN consists of a few fully
+connected layers and is applied independently to each token. Its role is
+to further process and transform each token’s representation, adding
+more non-linearity and complexity to the model’s understanding. The
+formula is generally FFN(x)=max(0,xW<span
+class="math inline"><sub>1</sub></span>+b<span
+class="math inline"><sub>1</sub></span>)W<span
+class="math inline"><sub>2</sub></span>+b<span
+class="math inline"><sub>2</sub></span>.</p></li>
+<li><p><strong>Encoder-Decoder Architecture (High-Level):</strong> The
+original Transformer model was designed for machine translation and
+featured an encoder-decoder structure.</p>
+<ul>
+<li><p>The Encoder processes the input sequence (e.g., a sentence in
+English) and builds a rich contextual representation of it. Encoder-only
+models are good for tasks requiring input understanding, like
+classification.</p></li>
+<li><p>The Decoder takes the encoder’s output (and potentially other
+inputs) and generates the output sequence (e.g., the translated sentence
+in French). Decoder-only models are good for generative tasks like text
+completion. Many modern LLMs primarily used for text generation (like
+GPT models) are decoder-only architectures, while others used for tasks
+like summarization might use the full encoder-decoder structure or be
+encoder-only (like BERT).</p></li>
+</ul></li>
+<li><p><strong>Stacking Layers:</strong> Transformer models are
+typically "deep," meaning they consist of multiple encoder blocks (in
+the encoder) and multiple decoder blocks (in the decoder) stacked on top
+of each other. Each block contains the self-attention and feed-forward
+network components. This stacking allows the model to learn increasingly
+complex and abstract representations of the input data as it passes
+through the layers.</p></li>
+</ul>
+<h4 class="unnumbered"
+id="conceptual-block-diagram-of-a-transformer-block">Conceptual Block
+Diagram of a Transformer Block</h4>
+<p>A simplified textual representation of a single Transformer block
+(which could be an Encoder block or a Decoder block, with slight
+variations) would look like this:</p>
+<figure id="fig:transformer_block">
+<img src="diagrams/transformer_block.png" />
+<figcaption>Conceptual Block Diagram of a Transformer Block</figcaption>
+</figure>
+<p><strong>Explanation of Diagram:</strong></p>
+<ul>
+<li><p><strong>Input:</strong> The process starts with token embeddings
+that have positional encoding added to them.</p></li>
+<li><p><strong>Multi-Head Self-Attention:</strong> This input goes into
+the multi-head self-attention mechanism, where tokens interact and weigh
+each other’s importance.</p></li>
+<li><p><strong>Add &amp; Norm Layer:</strong> The output of the
+attention layer is typically added to the original input to that layer
+(a residual connection) and then normalized (Layer Normalization). This
+helps with training stability and information flow.</p></li>
+<li><p><strong>Feed-Forward Network:</strong> The normalized output then
+passes through a position-wise feed-forward network for further
+transformation.</p></li>
+<li><p><strong>Add &amp; Norm Layer:</strong> Another residual
+connection and layer normalization are applied.</p></li>
+<li><p><strong>Output:</strong> The output of this block can then be fed
+into the next identical block (if stacking multiple blocks) or, if it’s
+the final block, to a final output layer that converts the processed
+representations into token probabilities for generation. Decoder blocks
+would also have an additional multi-head attention layer that attends to
+the output of the encoder (in encoder-decoder architectures).</p></li>
+</ul>
+<p>The self-attention mechanism is the pivotal innovation that enables
+Transformers to effectively handle long-range dependencies in text, a
+significant improvement over prior architectures like RNNs and LSTMs
+which struggled with this due to their sequential nature and issues like
+vanishing gradients. For software engineers, this superior ability to
+maintain context over much longer inputs is critical for tasks such as
+understanding entire code files, lengthy technical documents, or
+extended conversations, making LLMs far more versatile and powerful.</p>
+<h1 id="llms-in-action-tools-and-agents">LLMs in Action: Tools and
+Agents</h1>
+<h2 id="llms-as-tool-users-extending-capabilities">LLMs as Tool Users:
+Extending Capabilities</h2>
+<p>While LLMs possess remarkable abilities in understanding and
+generating text, their knowledge is inherently limited by their training
+data, which has a specific cutoff point in time. They also lack the
+ability to perform precise calculations reliably or interact directly
+with the external world, such as accessing live databases or triggering
+actions in other software systems. "Tool use," often implemented via
+"function calling," is a mechanism that allows LLMs to overcome these
+limitations by integrating with external functions, APIs, and data
+sources.</p>
+<h3 id="the-concept-of-tool-use-function-calling">The Concept of Tool
+Use (Function Calling)</h3>
+<p>The core idea behind LLM tool use is to enable the model to request
+the execution of predefined functions when it determines that doing so
+would help fulfill a user’s request or achieve a given task. Instead of
+trying to generate an answer based solely on its internal knowledge, the
+LLM can recognize when it needs, for example, current weather
+information, the result of a mathematical calculation, or data from a
+specific enterprise API.</p>
+<p>Function Calling is the common term for how this is implemented. In
+this paradigm, LLMs like GPT-4 have been fine-tuned to detect when a
+function call is necessary and to output a structured data object,
+typically in JSON format, that specifies the name of the function to be
+called and the arguments to pass to it. Crucially, the LLM itself does
+not execute the function. Instead, it acts as a "reasoner" or "router,"
+deciding which tool (function) is appropriate for the current context
+and what inputs that tool needs. The actual execution of the function is
+handled by the application code that is interacting with the LLM.</p>
+<p>This capability represents a fundamental architectural pattern for
+building LLM-powered applications. It allows software engineers to
+create a powerful synergy by combining the natural language
+understanding and reasoning strengths of LLMs with the deterministic,
+precise, and specialized capabilities of existing software tools and
+APIs. Each component in this architecture focuses on what it does best:
+the LLM interprets intent and plans the use of tools, while traditional
+software components execute those tools and provide factual results.
+This separation of concerns is key to building robust, extensible, and
+reliable LLM-integrated systems.</p>
+<h3 id="how-llms-interact-with-external-apis-and-functions">How LLMs
+Interact with External APIs and Functions</h3>
+<p>The interaction between an LLM and an external tool or API typically
+follows a well-defined workflow:</p>
+<ol>
+<li><p><strong>User Query to LLM:</strong> The process starts with a
+user providing a query or instruction to the LLM-powered
+application.</p></li>
+<li><p><strong>LLM Processing and Tool Selection:</strong> The LLM
+analyzes the query. If it determines that an external tool is needed to
+fulfill the request, it generates a structured output (e.g., a JSON
+object) that specifies the function to be called and the necessary
+arguments. For example, if the user asks, "What’s the weather like in
+London?", the LLM might output:</p>
+<pre><code>[ caption=Example LLM output for tool selection, basicstyle=\ttfamily\footnotesize\linespread{0.9}, breaklines=true]
+		{
+			&quot;tool_name&quot;: &quot;get_weather&quot;,
+			&quot;arguments&quot;: {
+				&quot;city&quot;: &quot;London&quot;,
+				&quot;unit&quot;: &quot;celsius&quot;
+			}
+		}
+	</code></pre></li>
+<li><p><strong>Application Code Receives Request:</strong> The
+application code that hosts the LLM receives this structured
+request.</p></li>
+<li><p><strong>Function Execution by Application:</strong> The
+application code then parses this request and executes the actual
+<code>get_weather</code> function (which might involve calling an
+external weather API) with the provided arguments ("London",
+"celsius").</p></li>
+<li><p><strong>Result Returned to LLM:</strong> The result from the
+executed function (e.g., "The weather in London is 15°C and cloudy") is
+then sent back to the LLM, typically as part of a new prompt or
+context.</p></li>
+<li><p><strong>LLM Formulates Final Response:</strong> The LLM uses this
+new information (the tool’s output) to formulate a natural language
+response to the user’s original query (e.g., "The current weather in
+London is 15 degrees Celsius and cloudy.").</p></li>
+</ol>
+<p>To make the LLM "aware" of the available tools and how to use them,
+developers provide descriptions or schemas of these tools as part of the
+initial prompt or system message to the LLM. These descriptions detail
+what each tool does, the parameters it expects (including their names,
+types, and purpose), and sometimes even examples of how to use it.</p>
+<p>The quality of these tool descriptions is critical. They act as an
+"API contract" for the LLM. A clear, accurate, and unambiguous
+description directly impacts the LLM’s ability to correctly choose the
+right tool and provide the correct arguments. If the description is
+vague or misleading, the LLM is likely to make errors in its function
+call requests, leading to application failures or incorrect results.
+Therefore, crafting effective tool descriptions is a new and important
+skill for software engineers building LLM applications, akin to
+designing good API documentation for human developers.</p>
+<h3 id="practical-examples-of-llm-tool-integration">Practical Examples
+of LLM Tool Integration</h3>
+<p>The ability of LLMs to use tools unlocks a vast range of practical
+applications, making them significantly more useful in real-world
+business scenarios. Some common examples include:</p>
+<h4 class="unnumbered" id="retrieving-real-time-information">Retrieving
+Real-Time Information</h4>
+<p>LLMs have knowledge cutoffs, meaning their training data only goes up
+to a certain point in time. Tools allow them to access current
+information.</p>
+<ul>
+<li><p><strong>Example:</strong> A user asks, "What’s the current stock
+price for Company X?" The LLM can use a <code>get_stock_price</code>
+tool that calls a financial markets API to fetch the latest
+price.</p></li>
+<li><p><strong>Example:</strong> Answering questions about today’s news
+or weather forecasts.</p></li>
+</ul>
+<h4 class="unnumbered" id="interacting-with-databases">Interacting with
+Databases</h4>
+<p>LLMs can use tools to query and retrieve data from various
+databases.</p>
+<ul>
+<li><p><strong>Example:</strong> A customer service LLM might use a
+<code>get_customer_order_status</code> tool that queries a CRM or order
+management system database based on a customer’s ID or order
+number.</p></li>
+</ul>
+<h4 class="unnumbered" id="performing-actions">Performing Actions</h4>
+<p>Tools can enable LLMs to trigger actions in other systems.</p>
+<ul>
+<li><p><strong>Example:</strong> A personal assistant LLM could use a
+<code>send_email</code> tool to draft and send an email based on user
+instructions, or a <code>schedule_meeting</code> tool to interact with a
+calendar API.</p></li>
+<li><p><strong>Example:</strong> An LLM could use a tool to pay a bill
+through a financial service API.</p></li>
+</ul>
+<h4 class="unnumbered" id="using-computational-tools">Using
+Computational Tools</h4>
+<p>LLMs are not inherently strong at precise mathematical calculations.
+Tools can offload these tasks to specialized engines.</p>
+<ul>
+<li><p><strong>Example:</strong> For a query like "What is 25% of 789?",
+the LLM can call a calculator tool or even a more advanced computational
+engine like WolframAlpha.</p></li>
+</ul>
+<h4 class="unnumbered"
+id="connecting-with-enterprise-systems">Connecting with Enterprise
+Systems</h4>
+<p>LLMs can integrate with internal business applications, such as CRMs,
+ERPs, or proprietary knowledge bases, via tools that wrap these systems’
+APIs. This allows LLMs to provide contextually relevant information
+based on specific company data.</p>
+<p>By connecting LLMs to live data streams and actionable systems, tool
+use transforms them from sophisticated text generators into versatile
+components capable of participating actively in business processes and
+information workflows.</p>
+<h2 id="introducing-llm-agents-autonomous-problem-solvers">Introducing
+LLM Agents: Autonomous Problem Solvers</h2>
+<p>Building upon the concept of LLMs using tools, we arrive at a more
+advanced paradigm: LLM Agents. These are systems that leverage an LLM
+not just for a single tool use in response to a query, but as a central
+"brain" or reasoning engine to autonomously (or semi-autonomously) plan
+and execute a sequence of actions, often involving multiple tool uses,
+to achieve more complex and often multi-step goals.</p>
+<h3 id="what-are-llm-agents-a-human-analogy">What are LLM Agents? A
+Human Analogy</h3>
+<p>An LLM Agent can be understood by drawing an analogy to a human
+professional tasked with a complex project. Consider, for instance, a
+human travel agent. A client might approach the travel agent with a
+high-level request like, "I want to plan a two-week vacation to Italy in
+June, focusing on history and good food, with a budget of $5000."</p>
+<p>The human travel agent (the LLM Agent) doesn’t just give a single
+answer. Instead, they:</p>
+<ul>
+<li><p><strong>Understand the Goal:</strong> Decipher the client’s
+requirements, preferences, and constraints.</p></li>
+<li><p><strong>Plan:</strong> Break down the complex request into
+smaller, manageable sub-tasks: research flights, find suitable
+accommodation in different cities, identify historical sites, look up
+culinary experiences, check visa requirements, and ensure the plan stays
+within budget.</p></li>
+<li><p><strong>Use Tools:</strong> Employ various tools like a flight
+booking system (computer software), a hotel reservation platform,
+guidebooks or online resources (information sources), a calculator, and
+a telephone or email to contact suppliers.</p></li>
+<li><p><strong>Access Memory/Knowledge:</strong> Draw upon their own
+knowledge of Italy, past client experiences, and information from
+brochures or databases.</p></li>
+<li><p><strong>Make Decisions:</strong> Choose the best flight options,
+select appropriate hotels, and create an itinerary. This might involve
+some back-and-forth if initial options don’t fit the budget or
+preferences.</p></li>
+<li><p><strong>Execute Steps:</strong> Book flights and hotels, and
+provide the client with the finalized itinerary.</p></li>
+<li><p><strong>Adapt:</strong> If a preferred hotel is booked, the agent
+adapts by finding a suitable alternative.</p></li>
+</ul>
+<p>An LLM Agent operates on similar principles. It receives a high-level
+goal, and its core LLM component reasons about how to achieve it. It
+formulates a plan, which might involve calling various tools (APIs,
+functions, databases), processing the information obtained, making
+decisions based on that information, and potentially revising its plan
+as it proceeds until the goal is met or it determines it cannot be met.
+Key characteristics of LLM agents include reasoning, planning, memory,
+tool use, and a degree of autonomy in pursuing their objectives.</p>
+<p>The transition from simple tool-using LLMs to LLM Agents signifies a
+significant step towards more sophisticated AI systems. It represents a
+shift from single-turn, request-response interactions to multi-step,
+stateful, and goal-directed processes. This evolution has profound
+implications for software architecture, demanding more intricate control
+flows, robust state management mechanisms, and comprehensive error
+handling strategies to manage the increased complexity and autonomy.
+Frameworks such as LangChain and others developed by companies like
+NVIDIA and Hugging Face have emerged to help software engineers manage
+these complexities in building agentic systems.</p>
+<h3 id="key-components-llm-core-memory-planning-and-tools">Key
+Components: LLM Core, Memory, Planning, and Tools</h3>
+<p>LLM Agents are typically conceptualized as having several key
+interacting components that enable their autonomous behavior.
+Understanding these components helps in designing and building effective
+agentic systems.</p>
+<h4 class="unnumbered" id="llm-core-the-brain">LLM Core (The
+"Brain")</h4>
+<p>At the heart of every LLM Agent is the Large Language Model itself.
+This core LLM is responsible for the higher-level cognitive functions of
+the agent:</p>
+<ul>
+<li><p>Understanding the user’s goal or task.</p></li>
+<li><p>Reasoning about the steps needed to achieve the goal.</p></li>
+<li><p>Making decisions about which tools to use and when.</p></li>
+<li><p>Interpreting the outputs from tools.</p></li>
+<li><p>Generating responses or formulating the next steps in the plan.
+The capabilities of the chosen LLM (e.g., its reasoning prowess,
+knowledge base, and ability to follow complex instructions) directly
+influence the agent’s overall performance.</p></li>
+</ul>
+<h4 class="unnumbered" id="memory">Memory</h4>
+<p>For an agent to perform multi-step tasks effectively, it needs to
+remember information from previous steps and interactions. Memory in LLM
+agents can be categorized into:</p>
+<ul>
+<li><p><strong>Short-Term Memory:</strong> This is akin to working
+memory and typically holds the context of the current interaction. It
+includes the recent conversation history, the current plan, and
+intermediate results from tool use. This allows the agent to maintain
+coherence and relevance during an ongoing task. For example, a chatbot
+agent uses short-term memory to remember what the user said a few turns
+ago.</p></li>
+<li><p><strong>Long-Term Memory:</strong> This allows the agent to store
+and retrieve information over extended periods, potentially across
+multiple interactions or sessions. This can involve saving key facts,
+user preferences, or summaries of past tasks to external storage, such
+as vector databases (often used in Retrieval Augmented Generation, or
+RAG, systems) or traditional databases. Long-term memory enables
+personalization and learning from past experiences.</p></li>
+</ul>
+<h4 class="unnumbered" id="planning">Planning</h4>
+<p>This component is responsible for devising a strategy to achieve the
+given goal. Planning in LLM agents involves:</p>
+<ul>
+<li><p><strong>Task Decomposition:</strong> Breaking down a complex,
+high-level goal into smaller, more manageable sub-tasks or steps. The
+LLM core often performs this decomposition based on the goal and its
+understanding of available tools.</p></li>
+<li><p><strong>Plan Formulation:</strong> Creating a sequence of actions
+or tool uses to address the sub-tasks.</p></li>
+<li><p><strong>Reflection and Self-Correction:</strong> As the agent
+executes its plan, it may encounter errors, unexpected results, or new
+information. The planning component, often guided by the LLM core,
+allows the agent to reflect on its progress, evaluate the effectiveness
+of its current plan, and make adjustments or corrections if necessary.
+This iterative refinement is crucial for handling dynamic environments
+and complex problems.</p></li>
+</ul>
+<h4 class="unnumbered" id="tools">Tools</h4>
+<p>These are the external functions, APIs, databases, or other resources
+that the agent can utilize to interact with the outside world, gather
+information, or perform actions that the LLM core cannot do on its own.
+The set of available tools defines the agent’s capabilities beyond its
+inherent language processing abilities. Examples include web search
+APIs, calculators, code interpreters, database query interfaces, and
+APIs for enterprise systems.</p>
+<p>The following table provides a summary of these components and maps
+them to the human chef analogy presented in research , making the
+concepts more tangible for software engineers.</p>
+<div id="tab:agent_components_chef">
+<table>
+<caption>LLM Agent Components &amp; Human Analogy (Chef)</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Agent Component</strong></td>
+<td style="text-align: left;"><strong>Description</strong></td>
+<td style="text-align: left;"><strong>Human Chef Analogy (from
+)</strong></td>
+<td style="text-align: left;"><strong>Key Functions</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LLM Core (Brain)</td>
+<td style="text-align: left;">The central LLM responsible for
+understanding, reasoning, planning, and decision-making.</td>
+<td style="text-align: left;">Chef’s culinary knowledge, experience, and
+understanding of recipes.</td>
+<td style="text-align: left;">Goal interpretation, task decomposition,
+tool selection, output synthesis.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Short-Term Memory</td>
+<td style="text-align: left;">Holds context for the current interaction,
+recent history, and intermediate results.</td>
+<td style="text-align: left;">Chef’s mental checklist or scratchpad
+during cooking a specific dish.</td>
+<td style="text-align: left;">Maintaining conversation flow, tracking
+current sub-task progress.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Long-Term Memory</td>
+<td style="text-align: left;">Stores and retrieves information from past
+interactions, learned knowledge, or external knowledge bases.</td>
+<td style="text-align: left;">Chef’s repository of past cooking
+experiences and learned techniques.</td>
+<td style="text-align: left;">Personalization, learning from past
+successes/failures, retrieving relevant established knowledge.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Planning Module</td>
+<td style="text-align: left;">Devises and refines strategies to achieve
+goals, including task decomposition and self-correction.</td>
+<td style="text-align: left;">Chef creating a menu, outlining
+preparation steps, adapting if ingredients are missing or cooking times
+vary.</td>
+<td style="text-align: left;">Breaking down goals, sequencing actions,
+evaluating progress, modifying plans based on new information.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Toolset</td>
+<td style="text-align: left;">External functions, APIs, or resources the
+agent can use to gather information or perform actions.</td>
+<td style="text-align: left;">Chef’s kitchen equipment (knives, ovens,
+mixers) and access to pantry/recipes.</td>
+<td style="text-align: left;">Accessing real-time data, performing
+calculations, interacting with other systems, executing specific
+actions.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>This component-based view helps engineers understand the different
+facets of an agent’s operation and provides a mental model for designing
+and debugging these sophisticated systems.</p>
+<h3 id="reasoning-and-decision-making-in-agents">Reasoning and
+Decision-Making in Agents</h3>
+<p>The ability of LLM agents to "reason" and make decisions is central
+to their functionality. This process typically involves the LLM core
+analyzing the current state (which includes the overall goal,
+information gathered so far, and the history of actions taken) and then
+deciding on the next optimal action to move closer to the goal. Several
+prompting techniques and frameworks have been developed to enhance and
+structure this reasoning process:</p>
+<h4 class="unnumbered"
+id="chain-of-thought-cot-prompting">Chain-of-Thought (CoT)
+Prompting</h4>
+<p>This technique encourages the LLM to "think step by step" before
+arriving at a final answer or decision. Instead of directly outputting
+the result, the LLM is prompted to generate intermediate reasoning
+steps. This has been shown to improve performance on complex tasks that
+require multi-step thinking, as it allows the model to break down the
+problem and articulate its rationale. For an agent, these intermediate
+thoughts can guide its planning and tool selection process.</p>
+<h4 class="unnumbered" id="react-reason-act-framework">ReAct (Reason +
+Act) Framework</h4>
+<p>This is a widely adopted pattern for agentic behavior that explicitly
+combines reasoning with action. In the ReAct framework, the agent
+typically iterates through a loop of:</p>
+<ul>
+<li><p><strong>Thought:</strong> The LLM analyzes the current situation
+and decides what to do next.</p></li>
+<li><p><strong>Action:</strong> The LLM decides to use a specific tool
+with certain arguments.</p></li>
+<li><p><strong>Observation:</strong> The tool is executed by the
+external environment, and the result (observation) is fed back to the
+LLM. This cycle repeats, with the LLM using the observation from the
+previous action to inform its next thought and subsequent action, until
+the task is completed.</p></li>
+</ul>
+<h4 class="unnumbered" id="advanced-reasoning-frameworks">Advanced
+Reasoning Frameworks</h4>
+<p>Beyond CoT and ReAct, more sophisticated reasoning frameworks are
+being explored, such as:</p>
+<ul>
+<li><p><strong>Tree-of-Thought (ToT):</strong> This approach allows the
+LLM to explore multiple reasoning paths or alternative plans
+simultaneously, much like exploring different branches of a tree. It can
+then evaluate these different paths and choose the most promising one,
+or even backtrack if a path leads to a dead end.</p></li>
+<li><p><strong>Graph-of-Thought (GoT):</strong> This extends the idea
+further by representing thoughts as nodes in a graph, allowing for more
+complex and cyclical reasoning patterns, where thoughts can be combined
+and revisited.</p></li>
+</ul>
+<p>These reasoning techniques enable agents to tackle problems that are
+too complex for a single, direct LLM query. The iterative nature of
+frameworks like ReAct allows agents to gather information incrementally,
+adapt to new findings, and correct course if early steps prove
+unfruitful. This is fundamental to their ability to handle complex,
+multi-step problems.</p>
+<p>However, this iterative reasoning process also introduces challenges
+for software engineers. Unlike a straightforward function call, an
+agent’s path to a solution might involve multiple LLM invocations and
+tool uses. The control flow is not a simple linear sequence but a loop
+driven by the LLM’s ongoing reasoning. This can make predicting the
+exact sequence of operations, debugging issues, and ensuring reliable
+termination more complex than in traditional software systems. A key
+design consideration is to ensure the agent makes consistent progress
+towards its goal and to implement safeguards against unproductive loops
+or repetitive actions.</p>
+<h2
+id="model-context-protocol-mcp-standardizing-agent-tool-interaction">Model
+Context Protocol (MCP): Standardizing Agent-Tool Interaction</h2>
+<p>The integration of LLMs and agents with a multitude of external
+tools, APIs, and data sources presents a significant engineering
+challenge. Without standardization, developers face the daunting task of
+creating custom connectors for each unique combination of agent and
+tool. The Model Context Protocol (MCP) has emerged as an open standard
+designed to simplify and standardize these interactions.</p>
+<h3 id="the-why-rationale-for-mcp-in-software-engineering">The "Why":
+Rationale for MCP in Software Engineering</h3>
+<p>The primary motivation behind MCP is to solve the "M×N integration
+problem". In a typical enterprise or application ecosystem, there might
+be M different AI models or agents and N different tools or data sources
+they need to connect to. Without a standard, this could necessitate
+developing and maintaining up to M×N unique integrations, leading to a
+combinatorial explosion of complexity, redundancy, and maintenance
+overhead. This is inefficient, error-prone, and hinders scalability.</p>
+<p>MCP aims to act as a "universal connector" or an "AI USB port". It
+provides a standardized protocol that defines how AI applications
+(acting as MCP clients) can discover and interact with external tools
+and data sources (exposed as MCP servers). This means a tool provider
+can implement a single MCP server for their service, and any
+MCP-compliant AI application can then use it. Conversely, developers of
+AI applications can build their systems to consume MCP-compliant
+services, gaining access to a growing ecosystem of tools without writing
+bespoke integration code for each one.</p>
+<p>The benefits of adopting such a standard are manifold for software
+engineering:</p>
+<ul>
+<li><p><strong>Reduced Integration Complexity:</strong> Drastically cuts
+down the effort needed to connect agents to new tools and data
+sources.</p></li>
+<li><p><strong>Improved Interoperability:</strong> Enables different AI
+models and agent frameworks to work with a common set of tools.</p></li>
+<li><p><strong>Faster Development Cycles:</strong> Accelerates the
+development of agentic applications by providing pre-existing or easily
+creatable connectors.</p></li>
+<li><p><strong>Enhanced Security and Control:</strong> Offers a
+structured way to manage permissions, user consent, and data flow
+between agents and tools.</p></li>
+<li><p><strong>Ecosystem Growth:</strong> Fosters a broader ecosystem
+where tool providers and agent developers can more easily connect their
+respective offerings.</p></li>
+</ul>
+<p>From a software engineering standpoint, MCP is an architectural
+pattern that applies well-established principles—like standardized
+interfaces (akin to REST APIs with OpenAPI specifications), modularity,
+and separation of concerns—to the rapidly evolving domain of LLM tool
+integration. It’s a strategic approach to managing the inherent
+complexity in building sophisticated, interconnected AI systems. The
+"M×N integration problem" is a classic challenge in software
+integration, previously addressed by technologies like Enterprise
+Service Buses (ESBs) or standardized API formats. MCP brings a similar
+standardizing force to the agent-tool interface.</p>
+<h3
+id="mcp-explained-core-concepts-and-architecture-client-host-server">MCP
+Explained: Core Concepts and Architecture (Client-Host-Server)</h3>
+<p>MCP operates on a client-host-server architecture, defining clear
+roles and communication patterns for interaction between LLM
+applications and external capabilities.</p>
+<h4 class="unnumbered" id="core-architectural-components">Core
+Architectural Components</h4>
+<ul>
+<li><p><strong>Host:</strong> This is the primary AI-powered application
+that the end-user interacts with, such as an IDE with an AI coding
+assistant, a desktop application like Claude Desktop, or a custom
+agentic system. The Host is responsible for:</p>
+<ul>
+<li><p>Initiating and managing connections to MCP Servers via MCP
+Clients.</p></li>
+<li><p>Orchestrating the overall workflow, including when to consult the
+LLM and when to use tools.</p></li>
+<li><p>Managing security policies, user permissions, and consent for
+accessing tools and resources.</p></li>
+<li><p>Potentially merging context from multiple MCP clients/servers for
+the LLM.</p></li>
+</ul></li>
+<li><p><strong>Client:</strong> An MCP Client is a lightweight
+component, typically embedded within the Host application. Each Client
+maintains a dedicated 1:1 connection with a specific MCP Server. Its
+responsibilities include:</p>
+<ul>
+<li><p>Handling the MCP protocol specifics (message framing,
+request/response linking).</p></li>
+<li><p>Negotiating capabilities with the Server.</p></li>
+<li><p>Orchestrating messages between the Host (and its LLM) and the
+Server.</p></li>
+<li><p>Maintaining security boundaries; for example, one client
+connected to a file system server should not be able to access resources
+managed by another client connected to a different server unless
+explicitly allowed by the Host.</p></li>
+</ul></li>
+<li><p><strong>Server:</strong> An MCP Server is an independent process
+or service that exposes specific capabilities (tools, resources, or
+prompts) to MCP Clients according to the MCP standard. The Server acts
+as a wrapper or an adapter for the underlying tool, data source, or
+business logic it represents. For instance, there could be an MCP server
+for interacting with a Git repository, another for querying a PostgreSQL
+database, and another for accessing a company’s internal CRM
+API.</p></li>
+</ul>
+<h4 class="unnumbered" id="mcp-primitives">MCP Primitives</h4>
+<p>MCP defines three primary ways Servers can expose capabilities :</p>
+<ul>
+<li><p><strong>Tools:</strong> These are executable functions that the
+AI model can decide to call. Tools typically perform actions or
+computations, potentially with side effects (e.g., sending an email,
+creating a file, querying an API that modifies data). The LLM, guided by
+the Host, determines when to use a tool and with what
+arguments.</p></li>
+<li><p><strong>Resources:</strong> These represent structured data
+streams or contextual information that the user or the AI model can use
+(e.g., files, logs, API responses, database records). Resources are
+generally for information retrieval and do not execute actions with side
+effects.</p></li>
+<li><p><strong>Prompts:</strong> These are reusable, templated messages
+or predefined workflows that a user can invoke or that an application
+can use to guide interactions with the LLM via the Server.</p></li>
+</ul>
+<h4 class="unnumbered" id="communication-and-lifecycle">Communication
+and Lifecycle</h4>
+<ul>
+<li><p>MCP communication is based on JSON-RPC 2.0 messages. This
+standard defines the structure for requests, responses, and
+notifications.</p></li>
+<li><p>The protocol supports multiple transport mechanisms :</p>
+<ul>
+<li><p><strong>stdio (Standard Input/Output):</strong> Used for
+communication between processes running on the same machine. This is
+common for local MCP servers, like one providing access to the local
+file system.</p></li>
+<li><p><strong>HTTP + SSE (Server-Sent Events):</strong> Used for
+networked services or remote integrations. Client-to-server messages are
+typically sent via HTTP POST, while server-to-client messages (like
+streaming updates or notifications) can use SSE.</p></li>
+</ul></li>
+<li><p>The connection lifecycle generally involves :</p>
+<ul>
+<li><p><strong>Initialization:</strong> The Client sends an initialize
+request to the Server, sharing its protocol version and supported
+features. The Server responds with its own version and its advertised
+capabilities (available tools, resources, prompts). The Client then
+acknowledges with an initialized notification. This handshake ensures
+compatibility.</p></li>
+<li><p><strong>Message Exchange:</strong> Once initialized, the Client
+and Server can exchange messages. This can be request-response (Client
+asks Server to call a tool, Server returns result) or notifications
+(one-way messages).</p></li>
+<li><p><strong>Termination:</strong> The connection can be shut down by
+either party.</p></li>
+</ul></li>
+</ul>
+<p>The Host-Client-Server architecture of MCP provides a clear
+separation of concerns and robust security boundaries. The Host
+application, which contains the LLM, doesn’t need to know the intricate
+details of every tool it might use. It only needs to communicate with
+standardized MCP Clients. Each Client handles the protocol details for a
+specific MCP Server, and the Server, in turn, abstracts the underlying
+complexity of the actual tool or data source. This layered abstraction
+is a well-established software engineering pattern that promotes
+modularity (allowing different servers to be plugged in or swapped out),
+security (as the Host can enforce policies and Clients maintain distinct
+communication channels), and overall system maintainability.</p>
+<h3 id="benefits-of-mcp-for-building-robust-agentic-services">Benefits
+of MCP for Building Robust Agentic Services</h3>
+<p>The adoption of Model Context Protocol offers several tangible
+benefits for software engineers and organizations building agentic AI
+systems:</p>
+<ul>
+<li><p><strong>Standardized Integration:</strong> MCP provides a
+universal method for connecting AI models to a diverse array of data
+sources and tools. This significantly reduces the need for custom,
+one-off integrations for each new tool or data source, saving
+development time and effort.</p></li>
+<li><p><strong>Enhanced Context Awareness:</strong> By enabling AI
+models to access real-time data and information from external systems
+through a standardized interface, MCP dramatically improves their
+ability to provide relevant, accurate, and up-to-date responses. Agents
+are no longer limited to their static training data.</p></li>
+<li><p><strong>Dynamic Tool Discovery and Execution:</strong> MCP allows
+agents to dynamically query MCP servers at runtime to discover the tools
+and resources they offer. This means an agent can adapt its behavior
+based on the available capabilities, rather than being restricted to a
+predefined, hardcoded set of functions.</p></li>
+<li><p><strong>Improved Security and Access Control:</strong> The
+protocol is designed with security in mind. It encourages explicit user
+consent for tool use and data access, and the client-host-server
+architecture allows for the implementation of robust authentication and
+authorization mechanisms at different layers. This helps protect
+sensitive data and ensures that agents only perform actions they are
+permitted to.</p></li>
+<li><p><strong>Ecosystem Growth and Interoperability:</strong> As more
+tools and platforms adopt MCP, a rich ecosystem emerges where any
+MCP-compliant client (agent) can potentially interact with any
+MCP-compliant server (tool/data source). This fosters innovation and
+allows developers to easily compose sophisticated agentic systems by
+leveraging a wide range of off-the-shelf capabilities.</p></li>
+<li><p><strong>Modularity and Maintainability:</strong> By decoupling
+agents from the specific implementations of the tools they use, MCP
+promotes a more modular system design. Tools can be updated, replaced,
+or added without requiring significant changes to the agent’s core
+logic, as long as the MCP interface remains consistent. This improves
+the long-term maintainability of complex AI applications.</p></li>
+</ul>
+<p>In essence, MCP simplifies the construction of complex,
+context-aware, and secure AI agent systems by standardizing a critical
+interface—the one between the agent’s reasoning core and the external
+world of data and actions. This allows engineers to focus more on the
+agent’s logic and goals, rather than on the plumbing of tool
+integration.</p>
+<h2
+id="agent-to-agent-a2a-protocol-enabling-collaborative-ai">Agent-to-Agent
+(A2A) Protocol: Enabling Collaborative AI</h2>
+<p>While the Model Context Protocol (MCP) standardizes how a single
+agent interacts with tools and data sources, many complex real-world
+problems can benefit from the collaboration of multiple specialized
+agents. The Agent-to-Agent (A2A) protocol is an emerging open standard
+designed to facilitate this inter-agent communication and coordination,
+enabling the development of more powerful and versatile multi-agent
+systems.</p>
+<h3 id="the-need-for-inter-agent-communication">The Need for Inter-Agent
+Communication</h3>
+<p>As tasks become increasingly intricate or span multiple domains of
+expertise, relying on a single, monolithic LLM agent can become
+inefficient or impractical. Just as in human organizations, where teams
+of specialists collaborate to achieve complex objectives, AI systems can
+benefit from a similar division of labor.</p>
+<p>Consider a business process like launching a new product. This might
+involve:</p>
+<ul>
+<li><p>A Market Research Agent to analyze trends and identify target
+audiences.</p></li>
+<li><p>A Product Design Agent to conceptualize features based on
+research.</p></li>
+<li><p>A Content Generation Agent to create marketing
+materials.</p></li>
+<li><p>A Sales Strategy Agent to plan the go-to-market
+approach.</p></li>
+</ul>
+<p>For these specialized agents to work together effectively, they need
+a standardized way to communicate, delegate tasks, share information,
+and coordinate their actions. This is where A2A comes in. It aims to
+allow specialized agents, potentially built by different teams or even
+different vendors using diverse underlying frameworks, to collaborate
+seamlessly on tasks that a single agent might struggle to handle
+alone.</p>
+<p>The A2A protocol addresses the next level of complexity in AI system
+design: moving beyond an agent using tools (as facilitated by MCP) to a
+scenario where agents themselves can act as tools or collaborators for
+other agents. This shift enables the creation of more decentralized,
+scalable, and robust AI solutions, capable of tackling problems that
+require a broader range of expertise or a more distributed approach to
+problem-solving.</p>
+<h3 id="a2a-explained-core-concepts-and-architecture">A2A Explained:
+Core Concepts and Architecture</h3>
+<p>The Agent-to-Agent (A2A) protocol, spearheaded by Google and
+supported by numerous technology partners, is an open standard designed
+to enable AI agents to communicate with each other, securely exchange
+information, and coordinate actions across various platforms or
+applications. It focuses on enabling true multi-agent scenarios where
+agents collaborate in their natural, often unstructured, modalities.</p>
+<h4 class="unnumbered"
+id="core-architectural-concepts-and-components">Core Architectural
+Concepts and Components</h4>
+<ul>
+<li><p><strong>Client Agent and Remote Agent (Server):</strong> A2A
+facilitates communication between a "client" agent and a "remote"
+agent.</p>
+<ul>
+<li><p>The Client Agent is responsible for formulating and communicating
+tasks to other agents.</p></li>
+<li><p>The Remote Agent (which acts as a server in the interaction) is
+responsible for receiving tasks, acting on them, and providing
+information or taking actions. Remote agents are typically hosted on an
+HTTP endpoint.</p></li>
+</ul></li>
+<li><p><strong>Agent Card:</strong> A crucial component for discovery,
+the Agent Card is a JSON-formatted document that an agent uses to
+advertise its capabilities, skills, connection endpoints (URL), and
+authentication requirements. This allows a client agent to identify the
+best remote agent for a particular task and understand how to
+communicate with it.</p></li>
+<li><p><strong>Task:</strong> Communication in A2A is task-oriented. A
+"task" is the fundamental unit of work, defined by the protocol with a
+unique identifier and a lifecycle (e.g., created, in-progress,
+completed, failed). This allows for tracking and management of
+potentially long-running, asynchronous collaborations.</p></li>
+<li><p><strong>Message and Artifacts:</strong> Agents exchange messages
+to convey context, instructions, replies, or user directives. The output
+or result of a task is known as an "artifact," which can be text, files,
+structured data, or other forms of content.</p></li>
+</ul>
+<h4 class="unnumbered"
+id="communication-and-key-principles">Communication and Key
+Principles</h4>
+<ul>
+<li><p><strong>Communication Protocol:</strong> A2A is built on existing
+standards, primarily using JSON-RPC 2.0 over HTTP(S) for messaging. It
+supports synchronous request-response interactions, streaming of results
+(often via Server-Sent Events - SSE), and asynchronous push
+notifications for status updates on long-running tasks.</p></li>
+<li><p><strong>Key Design Principles :</strong></p>
+<ul>
+<li><p>Embrace Agentic Capabilities: Focus on enabling agents to
+collaborate in natural, unstructured ways, even without shared memory or
+tools.</p></li>
+<li><p>Build on Existing Standards: Leverage HTTP, SSE, JSON-RPC for
+easier integration.</p></li>
+<li><p>Secure by Default: Support enterprise-grade authentication and
+authorization.</p></li>
+<li><p>Support for Long-Running Tasks: Design for tasks that may take
+hours or days, potentially involving human-in-the-loop steps, with
+mechanisms for real-time feedback and status updates.</p></li>
+<li><p>Modality Agnostic: Support various data types beyond text,
+including audio and video streaming.</p></li>
+</ul></li>
+</ul>
+<p>The "Agent Card" is a particularly important innovation for enabling
+dynamic and decentralized multi-agent systems. It functions like a
+service advertisement or a resume for agents, allowing them to discover
+and assess each other’s capabilities at runtime. This is analogous to
+service discovery mechanisms (e.g., using a service registry like Consul
+or Eureka) in microservices architectures, promoting flexibility and
+resilience. New agents can be introduced into the ecosystem, or existing
+ones updated, and other agents can discover and utilize their
+capabilities without requiring hardcoded integrations or system-wide
+reconfigurations. This dynamic discovery is essential for building
+scalable and adaptable multi-agent AI systems.</p>
+<h3 id="mcp-and-a2a-complementary-protocols-for-complex-systems">MCP and
+A2A: Complementary Protocols for Complex Systems</h3>
+<p>Model Context Protocol (MCP) and Agent-to-Agent (A2A) protocol,
+despite being developed by different organizations (Anthropic and
+Google, respectively), are designed to be complementary rather than
+competitive. They address different layers of functionality needed for
+building sophisticated AI systems:</p>
+<h4 class="unnumbered"
+id="mcp-agent-tooldata-communication-vertical-integration">MCP:
+Agent-Tool/Data Communication (Vertical Integration)</h4>
+<p>MCP focuses on standardizing how a single AI agent (or LLM
+application) connects to and utilizes external tools, data sources, and
+resources. It "arms" an individual agent with the necessary knowledge
+and capabilities by providing a universal interface to the external
+world. Think of it as defining how an agent uses its own
+instruments.</p>
+<h4 class="unnumbered"
+id="a2a-agent-to-agent-communication-horizontal-integration">A2A:
+Agent-to-Agent Communication (Horizontal Integration)</h4>
+<p>A2A focuses on standardizing how multiple autonomous AI agents
+communicate and collaborate with each other. It enables agents to
+delegate tasks, share information, and coordinate their actions to
+achieve a common, often more complex, goal. Think of it as defining how
+different specialists in a team work together.</p>
+<h4 class="unnumbered" id="the-synergy">The Synergy</h4>
+<p>The true power emerges when these protocols are used in conjunction.
+An individual agent might use MCP to access its specialized tools and
+data. Then, that agent (or a coordinating agent) can use A2A to
+collaborate with other specialized agents, each of which might also be
+using MCP for their own tool and data access.</p>
+<h4 class="unnumbered" id="conceptual-example">Conceptual Example</h4>
+<p>Imagine a complex business workflow for "resolving a customer
+complaint about a faulty product":</p>
+<ol>
+<li><p><strong>Customer Support Agent (Agent 1):</strong> Interacts with
+the customer (perhaps via a chat interface). It uses MCP to access tools
+like a CRM lookup tool (to get customer history) and a knowledge base
+tool (to find standard troubleshooting steps).</p></li>
+<li><p><strong>Technical Diagnostic Agent (Agent 2):</strong> If the
+issue is complex, Agent 1 might use A2A to delegate the diagnostic task
+to Agent 2. Agent 2, specialized in product diagnostics, could use MCP
+to access tools like a product specification database, a diagnostic
+script runner, or even an IoT data feed from the faulty device.</p></li>
+<li><p><strong>Logistics Agent (Agent 3):</strong> If Agent 2 determines
+a replacement is needed, it might use A2A to inform Agent 3 (specialized
+in logistics). Agent 3 would then use MCP to access tools like an
+inventory management system and a shipping API to arrange for the
+replacement.</p></li>
+<li><p><strong>Communication Back to Customer:</strong> Agent 1 receives
+updates from Agent 2 and Agent 3 via A2A and informs the customer of the
+resolution progress.</p></li>
+</ol>
+<p>In this scenario, MCP provides the "how-to" for each agent to use its
+specific instruments, while A2A provides the "how-to" for the agents to
+talk to each other and coordinate the overall workflow. It’s even
+possible for A2A agents to be modeled as MCP resources themselves,
+allowing one agent framework to discover and interact with another agent
+as if it were a tool.</p>
+<p>The following table provides a clearer distinction and highlights the
+complementary nature of MCP and A2A, which is essential for engineers
+designing multi-layered agentic systems.</p>
+<div id="tab:mcp_vs_a2a">
+<table>
+<caption>MCP vs. A2A Protocol Comparison</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Feature/Focus</strong></td>
+<td style="text-align: left;"><strong>Model Context Protocol
+(MCP)</strong></td>
+<td style="text-align: left;"><strong>Agent-to-Agent (A2A)
+Protocol</strong></td>
+<td style="text-align: left;"><strong>How They Complement</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Main Purpose</td>
+<td style="text-align: left;">Standardize agent-to-tool/data source
+interaction (vertical integration).</td>
+<td style="text-align: left;">Standardize agent-to-agent communication
+and collaboration (horizontal integration).</td>
+<td style="text-align: left;">MCP equips individual agents with
+capabilities; A2A enables these agents to work together on larger
+tasks.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Architecture</td>
+<td style="text-align: left;">Client-Host-Server: Host (LLM app) uses
+Clients to connect to Servers (tools/data).</td>
+<td style="text-align: left;">Primarily Client-Remote Agent: A client
+agent initiates tasks with a remote agent (server).</td>
+<td style="text-align: left;">An A2A agent might internally act as an
+MCP client to use its own tools.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Key Components</td>
+<td style="text-align: left;">Tools, Resources, Prompts exposed by
+Servers.</td>
+<td style="text-align: left;">Agent Card (for discovery), Task (unit of
+work), Messages, Artifacts.</td>
+<td style="text-align: left;">An A2A Agent Card could list capabilities
+that are ultimately fulfilled by the agent using MCP-exposed tools.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Primary Interaction</td>
+<td style="text-align: left;">Agent requests tool execution or resource
+access from an MCP server.</td>
+<td style="text-align: left;">Agents discover each other via Agent Cards
+and delegate/collaborate on Tasks.</td>
+<td style="text-align: left;">An agent uses MCP to get data, then A2A to
+share that data or a derived insight with another agent.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Security Focus</td>
+<td style="text-align: left;">User consent for tool/resource access,
+authN/authZ for server connections.</td>
+<td style="text-align: left;">Enterprise-grade authN/authZ between
+agents, secure exchange of information.</td>
+<td style="text-align: left;">Secure tool access via MCP can be a
+prerequisite for an agent to securely participate in an A2A
+collaboration requiring that tool’s output.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Typical Use Case</td>
+<td style="text-align: left;">An LLM agent using an external API (e.g.,
+weather) or querying a database.</td>
+<td style="text-align: left;">A multi-agent system where a planning
+agent delegates sub-tasks to specialized agents.</td>
+<td style="text-align: left;">A research agent uses MCP to gather data
+from multiple sources, then uses A2A to pass a summary to a
+report-writing agent.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Understanding these distinctions and synergies helps software
+engineers choose the appropriate protocol(s) when architecting different
+parts of complex, intelligent systems.</p>
+<h2 id="practical-implementation-mcpa2a-with-fastapi">Practical
+Implementation: MCP/A2A with FastAPI</h2>
+<p>FastAPI, a modern, high-performance web framework for building APIs
+with Python, has gained significant popularity among software engineers
+due to its speed, ease of use, and robust features like automatic data
+validation and documentation. Its asynchronous capabilities and reliance
+on Python type hints for data validation make it particularly
+well-suited for implementing the server-side components of both Model
+Context Protocol (MCP) and Agent-to-Agent (A2A) protocol
+interactions.</p>
+<h3 id="setting-up-a-fastapi-environment-for-agentic-services">Setting
+up a FastAPI Environment for Agentic Services</h3>
+<p>Before diving into building MCP or A2A services, a proper FastAPI
+development environment is essential. This typically involves:</p>
+<ul>
+<li><p><strong>Python Installation:</strong> Ensuring a compatible
+version of Python is installed (often Python 3.8+ for modern FastAPI
+features, though specific MCP/A2A SDKs might have their own
+requirements, e.g., Python 3.10+ for some MCP tools).</p></li>
+<li><p><strong>Virtual Environment:</strong> Creating an isolated Python
+virtual environment for the project to manage dependencies effectively.
+This can be done using <code>venv</code> or tools like
+<code>uv</code>.</p></li>
+</ul>
+<p>Shell commands:</p>
+<div class="sourceCode" id="cb2" data-language="bash"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> venv .venv</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate  <span class="co"># On Linux/macOS</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># .venv\Scripts\activate    # On Windows</span></span></code></pre></div>
+<p>Installing FastAPI and Uvicorn: Installing the core FastAPI library
+and an ASGI server like Uvicorn to run the application. Shell
+commands:</p>
+<div class="sourceCode" id="cb3" data-language="bash"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install fastapi uvicorn</span></code></pre></div>
+<p>Alternatively, using <code>uv</code>: Shell commands:</p>
+<div class="sourceCode" id="cb4" data-language="bash"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install fastapi uvicorn</span></code></pre></div>
+<p>Helper Libraries for MCP/A2A: For MCP server development with
+FastAPI, libraries like <code>FastAPI-MCP</code> or <code>FastMCP</code>
+can significantly simplify the process by handling much of the protocol
+boilerplate. These would be installed similarly: Shell commands:</p>
+<div class="sourceCode" id="cb5" data-language="bash"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install fastapi-mcp  <span class="co"># or mcp-sdk for FastMCP related tools</span></span></code></pre></div>
+<p>For A2A, if a Python SDK is available (as suggested by), it would
+also be installed in the virtual environment. For example,
+<code>pip install a2a-sdk</code>.</p>
+<p>FastAPI’s native asynchronous support is a key advantage, as many
+interactions in agentic systems (like calling external APIs or waiting
+for LLM responses) are I/O-bound and benefit from non-blocking
+operations. Its use of Pydantic for data modeling ensures that incoming
+requests and outgoing responses conform to the expected schemas, which
+is crucial when implementing standardized protocols like MCP (JSON-RPC
+based) and A2A. Furthermore, FastAPI’s automatic generation of OpenAPI
+documentation can be helpful for developers understanding and testing
+the MCP/A2A services they build.</p>
+<h3 id="building-an-mcp-server-with-fastapi-a-code-walkthrough">Building
+an MCP Server with FastAPI: A Code Walkthrough</h3>
+<p>Let’s illustrate building a simple MCP server using FastAPI. This
+server will expose a basic tool, for example, a function that
+concatenates two strings. We can leverage a library like
+<code>FastAPI-MCP</code> or <code>FastMCP</code> for this, or implement
+the core MCP logic if needed. For simplicity, we will conceptualize
+using a helper library that integrates with FastAPI.</p>
+<h4 class="unnumbered"
+id="conceptual-example-using-fastapi-mcp-principles">Conceptual Example
+using FastAPI-MCP principles</h4>
+<p><code>FastAPI-MCP</code> is designed to automatically convert
+existing FastAPI endpoints into MCP tools or resources.</p>
+<div class="sourceCode" id="cb6" data-language="Python"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastapi <span class="im">import</span> FastAPI</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Hypothetical import based on library&#39;s purpose</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastapi_mcp <span class="im">import</span> FastApiMCP </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pydantic <span class="im">import</span> BaseModel</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the FastAPI application</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> FastAPI(title<span class="op">=</span><span class="st">&quot;Simple String Tools MCP Server&quot;</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Define request model for our tool</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ConcatenateRequest(BaseModel):</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    string1: <span class="bu">str</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    string2: <span class="bu">str</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Define response model for our tool</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ConcatenateResponse(BaseModel):</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    result: <span class="bu">str</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a FastAPI endpoint that will become an MCP tool</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="at">@app.post</span>(<span class="st">&quot;/tools/concatenate&quot;</span>, response_model<span class="op">=</span>ConcatenateResponse)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> concatenate_strings(request: ConcatenateRequest) <span class="op">-&gt;</span> ConcatenateResponse:</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co">    Concatenates two input strings and returns the result.</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co">    This tool is useful for joining text segments.</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    concatenated_string <span class="op">=</span> request.string1 <span class="op">+</span> request.string2</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ConcatenateResponse(result<span class="op">=</span>concatenated_string)</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize and mount the FastAPI-MCP server</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="co"># The library would inspect &#39;app&#39; for endpoints and expose them via MCP.</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="co"># It would use endpoint path, docstrings, and Pydantic models for MCP tool schema.</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>mcp_server <span class="op">=</span> FastApiMCP(</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    app,</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">&quot;StringToolsServer&quot;</span>,</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    description<span class="op">=</span><span class="st">&quot;An MCP server providing basic string manipulation tools.&quot;</span>,</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>    base_url<span class="op">=</span><span class="st">&quot;http://localhost:8000&quot;</span> <span class="co"># URL where this FastAPI app runs</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>mcp_server.mount() <span class="co"># This would typically expose an /mcp endpoint</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>    <span class="im">import</span> uvicorn</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>    uvicorn.run(app, host<span class="op">=</span><span class="st">&quot;0.0.0.0&quot;</span>, port<span class="op">=</span><span class="dv">8000</span>)</span></code></pre></div>
+<p>In this example: We define a standard FastAPI application and an
+endpoint (<code>/tools/concatenate</code>). Pydantic models
+(<code>ConcatenateRequest</code>, <code>ConcatenateResponse</code>)
+define the input and output schemas for the tool. FastAPI uses these for
+validation and OpenAPI documentation, and <code>FastAPI-MCP</code> would
+leverage them to generate the MCP tool’s input and output schemas. The
+docstring of the <code>concatenate_strings</code> function would serve
+as the description for the MCP tool, helping the LLM understand what the
+tool does. <code>FastApiMCP(app,...).mount()</code> is the key step
+where the library integrates with the FastAPI app instance. It would
+typically scan the app’s routes, identify those intended as MCP tools
+(perhaps based on decorators or conventions), and expose them via a
+dedicated MCP endpoint (e.g., <code>/mcp</code>). This endpoint would
+handle incoming JSON-RPC messages according to the MCP
+specification.</p>
+<h4 class="unnumbered"
+id="conceptual-example-using-fastmcp-principles">Conceptual Example
+using FastMCP principles</h4>
+<p>FastMCP often uses decorators to explicitly define MCP tools from
+Python functions.</p>
+<div class="sourceCode" id="cb7" data-language="Python"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastapi <span class="im">import</span> FastAPI</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastmcp <span class="im">import</span> FastMCP <span class="co"># Hypothetical import based on library&#39;s purpose</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> uvicorn</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Create an MCP server instance</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>mcp_logic <span class="op">=</span> FastMCP(<span class="st">&quot;SimpleStringTools&quot;</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a Python function and decorate it as an MCP tool</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp_logic.tool</span>()</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> concatenate(string1: <span class="bu">str</span>, string2: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co">    Concatenates two input strings.</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co">    Use this to join pieces of text.</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters:</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co">        string1 (str): The first string.</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co">        string2 (str): The second string.</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co">        str: The combined string.</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> string1 <span class="op">+</span> string2</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a FastAPI app to host the MCP server logic</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> FastAPI()</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Mount the FastMCP logic onto a FastAPI route (e.g., /mcp)</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="co"># This step would involve specific integration code provided by FastMCP</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="co"># to handle JSON-RPC requests at this endpoint and dispatch to mcp_logic.</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="co"># For example: app.include_router(mcp_logic.as_fastapi_router(), prefix=&quot;/mcp&quot;)</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="co"># A simplified conceptual mounting:</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="at">@app.post</span>(<span class="st">&quot;/mcp&quot;</span>)</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> handle_mcp_request(request_data: <span class="bu">dict</span>): <span class="co"># Actual handling is more complex</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># FastMCP would provide a handler here to process JSON-RPC,</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    <span class="co"># invoke &#39;concatenate&#39; if requested, and return JSON-RPC response.</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>    <span class="co"># This is a placeholder for that complex logic.</span></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> request_data.get(<span class="st">&quot;method&quot;</span>) <span class="op">==</span> <span class="st">&quot;tool_concatenate&quot;</span>: <span class="co"># Simplified check</span></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>        params <span class="op">=</span> request_data.get(<span class="st">&quot;params&quot;</span>, {})</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> concatenate(params.get(<span class="st">&quot;string1&quot;</span>), params.get(<span class="st">&quot;string2&quot;</span>))</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> {<span class="st">&quot;jsonrpc&quot;</span>: <span class="st">&quot;2.0&quot;</span>, <span class="st">&quot;result&quot;</span>: result, <span class="st">&quot;id&quot;</span>: request_data.get(<span class="st">&quot;id&quot;</span>)}</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">&quot;jsonrpc&quot;</span>: <span class="st">&quot;2.0&quot;</span>, <span class="st">&quot;error&quot;</span>: {<span class="st">&quot;code&quot;</span>: <span class="op">-</span><span class="dv">32601</span>, <span class="st">&quot;message&quot;</span>: <span class="st">&quot;Method not found&quot;</span>}, <span class="op">\</span></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;id&quot;</span>: request_data.get(<span class="st">&quot;id&quot;</span>)}</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>    uvicorn.run(app, host<span class="op">=</span><span class="st">&quot;0.0.0.0&quot;</span>, port<span class="op">=</span><span class="dv">8000</span>)</span></code></pre></div>
+<p>In this FastMCP style: An <code>FastMCP</code> instance
+(<code>mcp_logic</code>) is created. The <code>@mcp_logic.tool()</code>
+decorator registers the <code>concatenate</code> function as an MCP
+tool. FastMCP would use the function signature (type hints) and
+docstring to generate the MCP tool schema. The FastMCP instance then
+needs to be exposed via a FastAPI endpoint (e.g., <code>/mcp</code>).
+The library would provide mechanisms to translate incoming JSON-RPC
+requests at this endpoint into calls to the registered Python functions
+and format the responses correctly.</p>
+<p>Libraries like <code>FastAPI-MCP</code> and <code>FastMCP</code> aim
+to abstract away the low-level details of the MCP protocol (like
+JSON-RPC message parsing, request dispatching, and response formatting),
+allowing software engineers to focus on implementing the actual business
+logic of their tools. This significantly lowers the barrier to entry for
+creating MCP-compliant servers.</p>
+<h3
+id="illustrative-block-diagram-of-the-fastapi-mcp-service">Illustrative
+Block Diagram of the FastAPI MCP Service</h3>
+<p>To visualize how a FastAPI application serves as an MCP server,
+consider the following components and their interactions:</p>
+<figure id="fig:mcp_server_diagram">
+<img src="diagrams/mcp_server.png" />
+<figcaption>Block Diagram of the FastAPI MCP Service
+Architecture.</figcaption>
+</figure>
+<h4 class="unnumbered" id="explanation-of-diagram">Explanation of
+Diagram</h4>
+<ul>
+<li><p><strong>MCP Client / LLM Agent Host:</strong> This is the
+application (e.g., an IDE with an AI assistant, Claude Desktop, or a
+custom Python script running an agent) that wants to use a tool. It
+constructs an MCP request (a JSON-RPC message).</p></li>
+<li><p><strong>Transport Layer:</strong> The request is sent over a
+chosen transport (stdio for local servers, HTTP/SSE for remote servers)
+to the FastAPI application.</p></li>
+<li><p><strong>FastAPI Application (MCP Server):</strong></p>
+<ul>
+<li><p><strong>Transport Handler:</strong> The FastAPI application (via
+Uvicorn or another ASGI server) listens for incoming requests on the
+configured transport.</p></li>
+<li><p><strong>MCP Protocol Layer:</strong> A library like
+<code>FastAPI-MCP</code> or <code>FastMCP</code>, or custom MCP handling
+logic, parses the incoming JSON-RPC message. It identifies that this is
+a request to call a specific MCP tool.</p></li>
+<li><p><strong>FastAPI Router:</strong> The protocol layer dispatches
+the call to the appropriate FastAPI endpoint (if using
+<code>FastAPI-MCP</code> where endpoints are tools) or to the Python
+function registered as an MCP tool (if using FastMCP-style
+decorators).</p></li>
+<li><p><strong>FastAPI Endpoint / Decorated Function:</strong> This is
+the Python code written by the developer that implements the tool’s
+logic.</p></li>
+<li><p><strong>Business Logic / API Client:</strong> The tool’s
+implementation might involve direct computation, calling other internal
+services, or making requests to external APIs or databases.</p></li>
+</ul></li>
+<li><p><strong>Response Path:</strong> The result from the business
+logic is returned to the FastAPI endpoint/function, then formatted by
+the MCP Protocol Layer into a JSON-RPC response, and sent back to the
+MCP Client via the Transport Handler.</p></li>
+<li><p><strong>Underlying Data Source / External API:</strong> If the
+MCP tool is a wrapper around an existing service, the Business Logic
+component will interact with this external system.</p></li>
+</ul>
+<p>This diagram illustrates the flow of an MCP tool invocation request
+from an agent to a FastAPI-based MCP server and back, highlighting the
+layers of abstraction provided by FastAPI and MCP helper libraries.</p>
+<h3
+id="exposing-a2a-endpoints-with-fastapi-conceptual-overview-block-diagram">Exposing
+A2A Endpoints with FastAPI (Conceptual Overview &amp; Block
+Diagram)</h3>
+<p>FastAPI can also serve as the framework for hosting "remote agents"
+in an Agent-to-Agent (A2A) communication scenario. In A2A, one agent
+(the client agent) discovers and delegates tasks to another agent (the
+remote agent, which acts as a server).</p>
+<h4 class="unnumbered" id="conceptual-overview">Conceptual Overview</h4>
+<ul>
+<li><p><strong>A2A Server (Remote Agent) with FastAPI:</strong> A
+FastAPI application can expose the necessary HTTP endpoints required by
+the A2A protocol.</p></li>
+<li><p><strong>Agent Card Discovery:</strong> The remote agent needs to
+make its "Agent Card" discoverable. This is typically a JSON file served
+from a well-known path, often <code>/.well-known/agent.json</code> on
+the agent’s domain. A FastAPI route can be set up to serve this static
+JSON file or generate it dynamically.</p></li>
+<li><p><strong>Task Handling Endpoints:</strong> The A2A protocol
+defines how tasks are submitted and managed. A FastAPI application would
+need endpoints to:</p>
+<ul>
+<li><p>Receive new task requests (e.g., at a <code>/run</code> endpoint
+as seen in some examples, or specific paths like
+<code>/tasks/send</code> or <code>/message/send</code> as per evolving
+A2A specifications).</p></li>
+<li><p>Handle message exchanges related to an ongoing task.</p></li>
+<li><p>Provide status updates for long-running tasks, potentially using
+Server-Sent Events (SSE) for streaming responses.</p></li>
+</ul></li>
+<li><p><strong>A2A Python SDK:</strong> If a mature A2A Python SDK is
+available (as suggested by), it would likely provide utilities to
+simplify the implementation of these A2A server-side functionalities
+within a FastAPI application, handling A2A message parsing, task
+lifecycle management, and response formatting.</p></li>
+<li><p><strong>Agent Core Logic:</strong> Behind these FastAPI
+endpoints, the remote agent’s core logic (which might involve an LLM,
+its own tools possibly accessed via MCP, and memory) would process the
+tasks delegated to it.</p></li>
+</ul>
+<h4 class="unnumbered"
+id="illustrative-block-diagram-of-fastapi-based-a2a-communication">Illustrative
+Block Diagram of FastAPI-based A2A Communication</h4>
+<figure id="fig:mcp_a2a_diagram">
+<img src="diagrams/mcp_a2a.png" />
+<figcaption>Block Diagram of the FastAPI A2A Service
+Architecture.</figcaption>
+</figure>
+<h4 class="unnumbered" id="explanation-of-diagram-1">Explanation of
+Diagram</h4>
+<ul>
+<li><p><strong>Discovery:</strong> The Client Agent (which could also be
+a FastAPI application or any A2A-compliant agent) first discovers the
+Remote Agent by fetching its Agent Card (a JSON file) from a well-known
+HTTP endpoint hosted by the Remote Agent’s FastAPI application.</p></li>
+<li><p><strong>Task Request:</strong> The Client Agent sends an A2A task
+request (a JSON-RPC message over HTTP POST) to a specific endpoint on
+the Remote Agent’s FastAPI server (e.g., <code>/run</code> or
+<code>/tasks/send</code>).</p></li>
+<li><p><strong>Remote Agent (FastAPI App 2 - A2A Server):</strong></p>
+<ul>
+<li><p><strong>FastAPI HTTP Endpoints:</strong> The FastAPI app receives
+the request.</p></li>
+<li><p><strong>A2A Protocol Handler:</strong> This layer (potentially
+facilitated by an A2A SDK) parses the A2A message, validates it, and
+manages the A2A task lifecycle.</p></li>
+<li><p><strong>Agent Core Logic:</strong> The task is delegated to the
+Remote Agent’s core logic, which uses its LLM, planning capabilities,
+and memory to process the task.</p></li>
+<li><p><strong>MCP Client (Optional):</strong> The Remote Agent’s core
+logic might itself be an MCP client, using MCP to access its own
+specialized tools or data sources (represented by External MCP
+Servers).</p></li>
+</ul></li>
+<li><p><strong>A2A Response/Status Updates:</strong> The Remote Agent’s
+A2A Protocol Handler formats the result or status updates into
+A2A-compliant JSON-RPC messages and sends them back to the Client Agent,
+possibly over HTTP response or an SSE stream for long-running
+tasks.</p></li>
+</ul>
+<p>This diagram illustrates how FastAPI can serve as the web framework
+for both the external-facing A2A protocol endpoints and for
+orchestrating the internal workings of a remote agent. A sophisticated
+agent might act as an MCP client to gather information or use tools, and
+simultaneously act as an A2A server to offer its specialized
+capabilities to a wider network of collaborating agents. This
+composability is key to building complex, multi-functional agentic
+systems.</p>
+<h1 id="engineering-agentic-systems-with-mcp-and-a2a">Engineering
+Agentic Systems with MCP and A2A</h1>
+<h2 id="integrating-existing-business-services-with-mcp">Integrating
+Existing Business Services with MCP</h2>
+<p>One of the most significant advantages of the Model Context Protocol
+(MCP) for enterprises is its ability to bridge the gap between modern AI
+agents and existing business systems. Many organizations rely on a
+plethora of internal services, databases, and legacy applications that
+contain valuable data and perform critical functions. MCP provides a
+standardized way to make these existing assets accessible to LLM agents
+without requiring complete overhauls or complex, bespoke integrations
+for each agent.</p>
+<h3
+id="patterns-for-wrapping-business-logic-as-mcp-toolsresources">Patterns
+for Wrapping Business Logic as MCP Tools/Resources</h3>
+<p>Several software engineering patterns can be applied when using an
+MCP server to expose existing business logic or APIs as MCP tools and
+resources. The MCP server essentially acts as an intermediary or an
+adapter.</p>
+<h4 class="unnumbered" id="facade-pattern">Facade Pattern</h4>
+<p>This is a common approach where the MCP server provides a simplified,
+unified, and AI-friendly interface (the facade) over one or more complex
+underlying business APIs (which could be REST, GraphQL, SOAP, gRPC) or
+even legacy systems. The MCP server receives requests in the MCP format
+(JSON-RPC) for a specific tool or resource. It then translates this
+request into the appropriate calls to the backend business service(s),
+handles any necessary data transformations, and formats the response
+from the business service back into an MCP-compliant response for the
+LLM agent. For example, Azure API Management can expose existing REST
+APIs as remote MCP servers without needing to rebuild them. Libraries
+like <code>FastAPI-MCP</code> are designed to easily turn FastAPI
+applications (which might themselves be wrappers for other services)
+into MCP servers.</p>
+<h4 class="unnumbered" id="adapter-pattern">Adapter Pattern</h4>
+<p>Closely related to the Facade pattern, the Adapter pattern is
+particularly useful when the existing business service’s interface is
+incompatible with what an MCP tool or resource expects or what an LLM
+can easily consume. The MCP server acts as an adapter, converting the
+MCP-style interaction into a format understood by the legacy or
+disparate system.</p>
+<h4 class="unnumbered" id="exposing-database-functionalities">Exposing
+Database Functionalities</h4>
+<p>Internal databases are rich sources of enterprise data. MCP can make
+this data accessible to LLM agents in a controlled manner:</p>
+<ul>
+<li><p><strong>Direct Query Tools (with caution):</strong> An MCP tool
+could be created that allows an LLM agent to submit SQL queries (or
+other database query languages) for execution against a database. This
+offers flexibility but requires stringent security measures, input
+sanitization, and access controls to prevent unauthorized data access or
+malicious queries.</p></li>
+<li><p><strong>Predefined Queries/Views as Tools/Resources:</strong> A
+safer and often more practical approach is to expose specific,
+predefined queries or database views as distinct MCP tools or resources.
+For example, an MCP server might offer a tool like
+<code>get_customer_orders(customer_id: str)</code> which executes a
+specific, optimized SQL query against the CRM database, or a resource
+like <code>product_catalog_summary</code> that provides a curated view
+of product data. This approach gives finer-grained control over data
+access.</p></li>
+<li><p><strong>Specialized Database MCP Servers:</strong> Tools like the
+"MCP Toolbox for Databases" (supporting PostgreSQL, Spanner, Cloud SQL,
+Bigtable, etc.) are designed to act as MCP servers specifically for
+database interaction, handling complexities like connection pooling and
+authentication, and exposing database functionalities in an
+MCP-compliant way. The dbt MCP server similarly provides tools for LLMs
+to understand data assets and query metrics from a dbt project.</p></li>
+</ul>
+<h4 class="unnumbered"
+id="key-considerations-for-wrapping-existing-services">Key
+Considerations for Wrapping Existing Services</h4>
+<ul>
+<li><p><strong>Security:</strong> This is paramount. The MCP server must
+handle authentication and authorization for the underlying business
+services it wraps. Credentials for backend systems should be securely
+managed by the MCP server and not exposed to the LLM agent. Access
+controls should ensure that agents can only invoke tools and access
+resources they are permitted to use.</p></li>
+<li><p><strong>Data Transformation:</strong> Data formats from existing
+APIs or databases might not be optimal for LLM consumption. The MCP
+server may need to transform data into a more structured,
+natural-language-friendly, or token-efficient format.</p></li>
+<li><p><strong>Error Mapping and Handling:</strong> Errors from backend
+services need to be caught by the MCP server and translated into
+meaningful MCP error responses that the agent can understand and
+potentially act upon.</p></li>
+<li><p><strong>Performance and Scalability:</strong> The MCP server
+itself can become a bottleneck if not designed efficiently. Caching
+strategies, asynchronous operations (well-supported by frameworks like
+FastAPI), and proper resource management are important.</p></li>
+<li><p><strong>Tool/Resource Definition for LLMs:</strong> Simply
+exposing an existing API endpoint as an MCP tool might not be effective
+if the API is complex or its parameters are not self-explanatory. The
+descriptions and schemas provided for MCP tools and resources must be
+crafted with the LLM agent as the "user" in mind. They need to be clear,
+unambiguous, and provide enough context for the LLM to understand when
+and how to use the tool correctly. This might involve creating MCP tools
+that are more granular or more abstract than the underlying API
+endpoints to better suit an agent’s reasoning process. For instance, a
+single MCP tool might orchestrate multiple calls to a legacy API to
+achieve a specific, agent-relevant outcome.</p></li>
+</ul>
+<p>Integrating existing services via MCP is not merely about technical
+connectivity; it’s about creating an "AI-native" interface for these
+services. This involves thoughtful design of the MCP server’s tools and
+resources to ensure they are discoverable, understandable, and
+effectively usable by LLM agents.</p>
+<h3 id="case-study-exposing-an-internal-crm-api-via-an-mcp-server">Case
+Study: Exposing an Internal CRM API via an MCP Server</h3>
+<p>Let’s consider a common enterprise scenario: a company wants its
+internal LLM-powered sales support agent to access and update customer
+information stored in their existing Customer Relationship Management
+(CRM) system. The CRM has a REST API, but directly integrating every
+agent with this potentially complex API is undesirable.</p>
+<h4 class="unnumbered" id="business-problem">Business Problem</h4>
+<p>Sales support personnel need quick access to customer details,
+interaction history, and the ability to log new interactions, often
+while conversing with customers or other team members. An LLM agent
+could streamline this by understanding natural language requests and
+interacting with the CRM.</p>
+<h4 class="unnumbered" id="solution-architecture-using-mcp">Solution
+Architecture using MCP</h4>
+<ul>
+<li><p><strong>LLM Agent (MCP Client):</strong> This is the sales
+support agent, likely running in a chat interface or integrated into a
+sales support platform. It’s designed to understand requests like "Show
+me the latest notes for customer ID 12345" or "Log a call with customer
+ID 67890 about their interest in product X."</p></li>
+<li><p><strong>FastAPI-based MCP Server (The Wrapper):</strong> A new
+service is built using FastAPI to act as the MCP server. This server
+will expose specific CRM functionalities as MCP tools.</p>
+<ul>
+<li><p><strong>Tool Example 1:
+<code>get_customer_details(customer_id: str) -&gt; dict</code></strong>
+<em>Description for LLM:</em> "Retrieves key details for a customer
+given their ID, such as name, contact information, and account status."
+<em>Implementation:</em> When invoked, this tool’s function within the
+FastAPI MCP server will:</p>
+<ul>
+<li><p>Receive <code>customer_id</code> from the MCP request.</p></li>
+<li><p>Construct the appropriate GET request to the internal CRM’s REST
+API endpoint (e.g.,
+<code>/api/v1/customers/{customer_id}</code>).</p></li>
+<li><p>Handle authentication with the CRM API (e.g., using a securely
+stored API key or OAuth token specific to the MCP server).</p></li>
+<li><p>Receive the JSON response from the CRM API.</p></li>
+<li><p>Potentially transform or simplify the JSON response into a more
+LLM-friendly dictionary.</p></li>
+<li><p>Return this dictionary as the result of the MCP tool
+call.</p></li>
+</ul></li>
+<li><p><strong>Tool Example 2:
+<code>get_recent_interactions(customer_id: str, limit: int = 5) -&gt; list</code></strong>
+<em>Description for LLM:</em> "Fetches a list of recent interactions
+(e.g., calls, emails) for a customer, up to a specified limit."
+<em>Implementation:</em> Similar to the above, but calls a different CRM
+API endpoint (e.g.,
+<code>/api/v1/customers/{customer_id}/interactions?limit={limit}</code>).</p></li>
+<li><p><strong>Tool Example 3:
+<code>log_customer_interaction(customer_id: str, interaction_type: str, notes: str) -&gt; dict</code></strong>
+<em>Description for LLM:</em> "Logs a new interaction with a customer,
+such as a call or email, including notes." <em>Implementation:</em> This
+tool would construct a POST request to the CRM API (e.g.,
+<code>/api/v1/customers/{customer_id}/interactions</code>) with a JSON
+body containing the interaction type and notes. It would return a
+success/failure status.</p></li>
+</ul></li>
+<li><p><strong>Internal CRM REST API:</strong> This is the existing
+enterprise system that the MCP server communicates with. Its interface
+remains unchanged.</p></li>
+</ul>
+<h4 class="unnumbered"
+id="implementation-details-for-the-fastapi-mcp-server">Implementation
+Details for the FastAPI MCP Server</h4>
+<ul>
+<li><p>The FastAPI application would use a library like
+<code>FastAPI-MCP</code> or <code>FastMCP</code>, or implement the MCP
+JSON-RPC handling directly.</p></li>
+<li><p>It would securely store credentials for accessing the CRM API
+(e.g., in environment variables, a secrets manager).</p></li>
+<li><p>Error handling would be crucial: if the CRM API returns an error,
+the MCP server must translate this into an appropriate MCP error
+response for the agent.</p></li>
+<li><p>Input validation (e.g., ensuring <code>customer_id</code> is in
+the correct format) would be handled by FastAPI’s Pydantic
+integration.</p></li>
+</ul>
+<h4 class="unnumbered" id="benefits-of-this-mcp-based-approach">Benefits
+of this MCP-based Approach</h4>
+<ul>
+<li><p><strong>Standardized Access for the Agent:</strong> The LLM agent
+interacts with a consistent MCP interface, regardless of the underlying
+CRM API’s specifics.</p></li>
+<li><p><strong>Reusable MCP Server:</strong> If the company later
+develops other LLM agents (e.g., a marketing agent, an executive
+dashboard agent) that also need CRM data, they can all use the same CRM
+MCP Server.</p></li>
+<li><p><strong>Centralized Security and Control:</strong> Authentication
+and fine-grained access control to the CRM API can be managed centrally
+within the MCP server. The LLM agent doesn’t need direct credentials to
+the CRM.</p></li>
+<li><p><strong>Abstraction of Complexity:</strong> The MCP server can
+hide the complexities or idiosyncrasies of the CRM API, presenting a
+cleaner, more task-oriented set of tools to the agent.</p></li>
+<li><p><strong>Maintainability:</strong> If the CRM API changes, only
+the MCP server needs to be updated; the LLM agent’s interaction logic
+(how it calls the MCP tools) can remain the same as long as the MCP tool
+signatures are stable.</p></li>
+</ul>
+<p>This case study demonstrates how MCP provides a practical and robust
+architectural pattern for integrating existing, valuable enterprise
+systems with the emerging capabilities of LLM agents, thereby unlocking
+new avenues for automation and AI-driven assistance within the
+enterprise.</p>
+<h2 id="llm-agents-solving-business-problems">LLM Agents Solving
+Business Problems</h2>
+<h3 id="examples-from-various-industries">Examples from Various
+Industries</h3>
+<p>The application of LLM agents is diverse, reflecting their
+adaptability to different domains and challenges.</p>
+<h4 id="customer-service-and-support">Customer Service and Support</h4>
+<p>This is one of the most prominent areas. LLM agents can power
+sophisticated chatbots and virtual assistants that go far beyond simple
+FAQ responses.</p>
+<p><em>Example:</em> An agent can handle customer inquiries, verify
+warranty status by querying a database (tool use), process refunds by
+interacting with a payment system (tool use), and escalate complex
+issues to human agents with full context. Companies like AT&amp;T and
+Alibaba are using autonomous assistants to provide real-time assistance
+to human agents or handle customer queries directly. Ruby Labs uses AI
+agents to resolve 98% of over 4 million monthly support chats without
+human intervention, even flagging risky behavior and offering discounts
+to prevent churn.</p>
+<h4 id="workflow-automation-and-robotic-process-automation-rpa">Workflow
+Automation and Robotic Process Automation (RPA)</h4>
+<p>LLM agents can automate complex business workflows that involve
+decision-making and interaction with multiple systems.</p>
+<p><em>Example:</em> In claims processing, an agent can ingest claim
+documents (potentially unstructured), extract relevant information,
+verify policy details against a database, check for fraud indicators,
+and initiate the payout process or flag for human review. JPMorgan’s
+COiN system uses machine learning (a precursor to modern LLM agents) to
+parse commercial credit agreements, drastically reducing
+lawyer-hours.</p>
+<h4 id="data-analysis-and-business-intelligence">Data Analysis and
+Business Intelligence</h4>
+<p>Agents can interpret natural language queries for data, interact with
+databases or analytics platforms, and generate summaries or
+insights.</p>
+<p><em>Example:</em> A business manager could ask, "What were our
+top-selling products in the Northeast region last quarter, and how does
+that compare to the previous quarter?" An LLM agent could parse this,
+formulate queries to a sales database (via an MCP tool like the dbt MCP
+server or MCP Toolbox for Databases), retrieve the data, perform a
+comparison, and present a natural language summary with key figures.
+Walmart’s "Always-On" inventory intelligence system uses AI/ML to
+optimize inventory based on sales data, demonstrating a sophisticated
+data analysis use case.</p>
+<h4 id="software-development">Software Development</h4>
+<p>LLM agents are transforming aspects of the software development
+lifecycle.</p>
+<p><em>Example:</em> GitHub Copilot, an LLM-powered coding assistant,
+suggests real-time code completions, helps debug, and can even generate
+entire functions based on natural language descriptions. More advanced
+agents can assist with transpiling code between languages, maintaining
+codebases by identifying technical debt, and generating unit tests.</p>
+<h4 id="healthcare">Healthcare</h4>
+<p>Agents are being explored for various clinical and administrative
+tasks.</p>
+<p><em>Example:</em> An agent could assist clinicians by summarizing
+patient records, cross-referencing symptoms with medical literature to
+suggest potential diagnoses (for human review), or triaging patients
+based on urgency by analyzing EHR data. Mayo Clinic’s AI-augmented
+triage system analyzes patient data to assign real-time risk scores in
+emergency rooms.</p>
+<h4 id="finance">Finance</h4>
+<p>The financial sector sees applications in fraud detection, risk
+management, and algorithmic trading.</p>
+<p><em>Example:</em> An LLM agent could monitor transaction patterns in
+real-time, use tools to query historical data and external risk
+databases, identify anomalies indicative of fraud, and either block
+suspicious transactions or alert human analysts.</p>
+<h4 id="e-commerce-and-supply-chain-management">E-commerce and Supply
+Chain Management</h4>
+<p>Agents can optimize inventory, personalize shopping experiences, and
+manage logistics.</p>
+<p><em>Example:</em> An e-commerce agent can provide dynamic product
+recommendations based on a user’s browsing history and stated intent,
+query inventory levels in real-time, and assist with order tracking. BCG
+is developing chat-based interfaces for supply chain management,
+allowing users to query order statuses and inventory levels.</p>
+<p>Across these diverse business problems, a common pattern emerges: the
+LLM agent acts as an intelligent orchestrator. It integrates information
+from multiple sources (often via tools, potentially standardized by MCP)
+and executes multi-step processes that involve planning and reasoning.
+In more complex scenarios, these agents might collaborate with other
+specialized agents (potentially via A2A) to achieve a broader business
+outcome. For instance, in expediting claims processing, an agent might
+first use MCP to access policy databases and customer records, then use
+A2A to communicate with a specialized fraud detection agent before
+passing the claim to an adjustment agent. The true value lies not just
+in the LLM’s linguistic capabilities, but in its capacity to
+intelligently coordinate these tools and collaborations to deliver a
+complete solution.</p>
+<h3 id="designing-agents-for-specific-business-outcomes">Designing
+Agents for Specific Business Outcomes</h3>
+<p>Developing effective LLM agents that deliver tangible business value
+requires a thoughtful design process, moving beyond simply prompting a
+powerful LLM. The focus should always be on the specific business
+problem to be solved and the desired outcome.</p>
+<h4 id="clearly-define-purpose-and-goals">Clearly Define Purpose and
+Goals</h4>
+<p>The first and most critical step is to articulate precisely what the
+agent is intended to achieve. What specific business problem will it
+solve? What are the measurable outcomes that define success? For
+example, instead of a vague goal like "improve customer service," a
+specific goal might be "reduce average customer query resolution time by
+20% for tier-1 issues" or "automate the initial qualification of 70% of
+inbound sales leads." This clarity guides all subsequent design
+decisions.</p>
+<h4
+id="identify-necessary-tools-data-sources-and-collaborations">Identify
+Necessary Tools, Data Sources, and Collaborations</h4>
+<p>Once the goal is clear, identify the capabilities the agent will
+need.</p>
+<p>What information does it need to access? (e.g., CRM data, product
+catalogs, knowledge bases, real-time APIs). These become candidates for
+tool development or MCP server integration. What actions does it need to
+perform? (e.g., update a database, send an email, schedule a meeting).
+These also map to tools. Are there other existing systems or specialized
+agents it needs to interact with? This might indicate a need for A2A
+protocol integration or designing the agent to be part of a multi-agent
+system.</p>
+<h4 id="engineer-the-agents-core-prompt-and-persona">Engineer the
+Agent’s Core Prompt and Persona</h4>
+<p>The agent’s core LLM requires careful prompt engineering to define
+its role, instructions, constraints, and overall persona.</p>
+<p>Instructions: Provide clear, unambiguous, step-by-step instructions
+on how it should approach its tasks, how it should use its tools, and
+what its objectives are. Using existing standard operating procedures or
+support scripts can be a good starting point for crafting these
+instructions. Persona: Define the agent’s communication style and tone,
+especially if it’s customer-facing. Tool Descriptions: As discussed in
+Chapter 2, providing clear and comprehensive descriptions of available
+tools is vital for the LLM to use them correctly.</p>
+<h4 id="iterative-development-and-testing">Iterative Development and
+Testing</h4>
+<p>Building an agent is rarely a one-shot process. It requires iterative
+development and testing to refine functionality and ensure alignment
+with business goals.</p>
+<h4 id="human-in-the-loop-refinement">Human-in-the-Loop Refinement</h4>
+<p>Incorporate feedback loops with end-users and domain experts to
+continuously improve the agent’s performance and adaptability. Effective
+agent design is fundamentally outcome-driven. It requires a deep
+understanding of the business process being automated or augmented,
+combined with a practical application of LLM capabilities, tool
+integration strategies, and iterative refinement based on real-world
+performance. The goal is to create an agent that not only functions
+correctly but also reliably delivers the intended business value.</p>
+<h1 id="real-world-applications-and-advanced-considerations">Real-World
+Applications and Advanced Considerations</h1>
+<h2
+id="human-in-the-loop-hitl-ensuring-reliability-and-control">Human-in-the-Loop
+(HITL): Ensuring Reliability and Control</h2>
+<p>As LLM agents become more autonomous and are deployed in increasingly
+critical business functions, ensuring their reliability, safety, and
+alignment with human expectations is paramount. Human-in-the-Loop (HITL)
+is an essential design philosophy and set of practices that integrate
+human judgment and oversight into agentic systems. It is not a sign of
+automation failure, but rather a strategic approach to building more
+robust, trustworthy, and effective AI solutions.</p>
+<h3 id="the-importance-of-hitl-in-agentic-systems">The Importance of
+HITL in Agentic Systems</h3>
+<p>The integration of HITL is crucial for several reasons, primarily
+stemming from the inherent limitations of current LLM technology and the
+need for accountability in automated decision-making:</p>
+<ul>
+<li><p><strong>Addressing LLM Limitations:</strong> Despite their
+advancements, LLMs can still "hallucinate" (generate plausible but
+incorrect information), exhibit biases present in their training data,
+or lack true understanding of complex nuances. HITL provides a mechanism
+to catch and correct these errors before they lead to negative
+consequences.</p></li>
+<li><p><strong>Ensuring Safety and Reliability:</strong> For tasks that
+are critical or sensitive—such as financial transactions, medical advice
+or actions, legal document generation, or modifications to production
+systems—allowing fully autonomous agent operation without human
+verification can be risky. HITL allows human experts to validate an
+agent’s proposed actions or outputs, especially when stakes are high.
+For example, user confirmation is a straightforward way to pause and
+validate specific actions before execution.</p></li>
+<li><p><strong>Building User Trust and Managing Accountability:</strong>
+When users know that a human can review or intervene in an AI agent’s
+process, it can significantly increase their trust in the system.
+Furthermore, HITL helps clarify accountability; if an error occurs, the
+points of human oversight are identifiable.</p></li>
+<li><p><strong>Handling Edge Cases and Ambiguity:</strong> AI agents may
+encounter novel situations, ambiguous queries, or scenarios where their
+confidence in a particular decision is low. HITL allows the agent to
+escalate these situations to a human who can apply domain expertise,
+common sense, or contextual understanding that the agent may
+lack.</p></li>
+<li><p><strong>Facilitating Continuous Improvement:</strong> Human
+feedback is invaluable for the ongoing improvement of LLM agents. When
+humans correct errors, refine outputs, or label data where the agent
+struggled, this information can be used to fine-tune the underlying LLM,
+improve prompt engineering, or enhance tool design, leading to better
+performance over time. This is a core principle of Reinforcement
+Learning from Human Feedback (RLHF).</p></li>
+<li><p><strong>Ethical Oversight:</strong> HITL allows for the
+incorporation of ethical considerations and human values into the
+agent’s operation, helping to mitigate bias and ensure fair
+outcomes.</p></li>
+</ul>
+<p>For software engineers, designing for HITL means architecting systems
+with explicit checkpoints for human review, intervention, and override.
+This is a strategic design choice that acknowledges the current
+capabilities and limitations of AI, leveraging human strengths—such as
+judgment, nuanced contextual understanding, and ethical reasoning—to
+complement the AI’s speed and data processing capabilities. This
+collaborative approach leads to more dependable and trustworthy AI
+solutions, which is particularly important as agents are given more
+responsibility in enterprise settings.</p>
+<h3 id="common-hitl-workflow-patterns">Common HITL Workflow
+Patterns</h3>
+<p>There are several common patterns for integrating Human-in-the-Loop
+into LLM agent workflows, each suited to different needs and stages of
+the agent’s operation:</p>
+<h4 class="unnumbered" id="review-and-approval">Review and Approval</h4>
+<p>This is one of the most common HITL patterns, especially for actions
+that have significant consequences or are irreversible.</p>
+<ul>
+<li><p><strong>Workflow:</strong> The LLM agent processes a request,
+determines a course of action (e.g., sending an email, updating a
+database record, executing a financial transaction), or generates
+content (e.g., a legal clause, a customer response). Before the action
+is executed or the content is finalized, it is presented to a human
+reviewer. The human can then approve the action/content, reject it, or
+edit it.</p></li>
+<li><p><strong>Example:</strong> An agent drafts a response to a
+critical customer complaint. A human support manager reviews and
+approves (or modifies) the draft before it’s sent to the customer.
+Amazon Bedrock Agents, for instance, offer an out-of-the-box user
+confirmation feature for this purpose.</p></li>
+</ul>
+<h4 class="unnumbered"
+id="data-labelingannotation-for-continuous-improvement-rlhf">Data
+Labeling/Annotation for Continuous Improvement (RLHF)</h4>
+<p>This pattern focuses on improving the agent’s underlying LLM or its
+training data over time.</p>
+<ul>
+<li><p><strong>Workflow:</strong> When the agent encounters data it’s
+uncertain about (e.g., an ambiguous user query, a difficult-to-classify
+image), or as part of a regular quality control process, these data
+points are sent to human annotators. Humans provide correct labels, rank
+responses, or offer corrections. This curated feedback is then used to
+fine-tune the LLM or improve the knowledge base it uses.</p></li>
+<li><p><strong>Example:</strong> An LLM agent used for sentiment
+analysis flags customer reviews where its confidence in the sentiment
+classification is low. Human reviewers then label these ambiguous
+reviews, and this new labeled data is used to retrain or fine-tune the
+sentiment analysis model.</p></li>
+</ul>
+<h4 class="unnumbered" id="exception-handling-and-escalation">Exception
+Handling and Escalation</h4>
+<p>This pattern is used when the agent is unable to complete a task,
+encounters an error it cannot resolve, or its confidence in a decision
+falls below a predefined threshold.</p>
+<ul>
+<li><p><strong>Workflow:</strong> The agent attempts to perform its
+task. If it fails or determines it cannot proceed reliably, it
+"escalates" the task, along with all relevant context, to a human
+operator or expert.</p></li>
+<li><p><strong>Example:</strong> A customer service chatbot tries to
+resolve a technical issue using its available tools and knowledge. If it
+exhausts its options or the customer indicates the problem is still not
+solved, the chatbot transfers the conversation (including the history)
+to a human support agent. The <code>KnowNo</code> framework, for
+example, triggers human queries when the LLM’s confidence in a plan is
+low.</p></li>
+</ul>
+<h4 class="unnumbered"
+id="interactive-refinement-collaborative-generation">Interactive
+Refinement (Collaborative Generation)</h4>
+<p>In this pattern, the human user and the LLM agent work together
+iteratively to produce a desired output.</p>
+<ul>
+<li><p><strong>Workflow:</strong> The agent generates an initial draft
+or proposes a solution. The human user reviews it and provides feedback,
+suggestions, or corrections. The agent then revises its output based on
+this feedback. This cycle can repeat multiple times until the user is
+satisfied.</p></li>
+<li><p><strong>Example:</strong> A software developer uses an LLM agent
+to generate a piece of code. The developer reviews the generated code,
+points out areas for improvement or bugs, and asks the agent to refine
+it. The agent incorporates the feedback and produces an updated version
+of the code. Frameworks like <code>LangGraph</code> support "interrupt"
+functionalities to pause agent execution and await user input for such
+scenarios.</p></li>
+</ul>
+<p>The following table summarizes these common HITL workflow patterns,
+providing a quick reference for engineers.</p>
+<div id="tab:hitl_patterns">
+<table style="width:95%;">
+<caption>HITL Workflow Patterns Overview</caption>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Pattern Name</strong></th>
+<th style="text-align: left;"><strong>Description</strong></th>
+<th style="text-align: left;"><strong>When to Use</strong></th>
+<th style="text-align: left;"><strong>Example Scenario</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Review &amp; Approval</td>
+<td style="text-align: left;">Agent proposes action/content; human
+validates before execution/release.</td>
+<td style="text-align: left;">Critical actions, irreversible operations,
+high-stakes content generation.</td>
+<td style="text-align: left;">Agent proposes a financial transaction;
+human accountant approves before execution.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Data Annotation for RLHF</td>
+<td style="text-align: left;">Humans label data where the model is
+uncertain or for quality control, feeding back into model training.</td>
+<td style="text-align: left;">Improving model accuracy over time,
+handling ambiguous data, specializing models for new domains.</td>
+<td style="text-align: left;">Agent flags unclear customer queries;
+humans categorize them to improve future intent recognition.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Exception Handling &amp; Escalation</td>
+<td style="text-align: left;">Agent escalates to a human when it fails,
+confidence is low, or a predefined error condition is met.</td>
+<td style="text-align: left;">Unforeseen situations, tasks requiring
+expertise beyond agent’s capability, ensuring task completion.</td>
+<td style="text-align: left;">Automated IT support agent cannot resolve
+a network issue and escalates to a human network engineer with
+logs.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Interactive Refinement</td>
+<td style="text-align: left;">Human and agent collaborate iteratively to
+create or refine an output.</td>
+<td style="text-align: left;">Creative tasks (writing, coding), complex
+problem-solving where human guidance is beneficial throughout.</td>
+<td style="text-align: left;">Agent generates a marketing slogan; human
+marketer provides feedback for tone and style; agent revises.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Choosing the right HITL pattern, or a combination of patterns,
+depends on the specific application, the level of risk involved, the
+need for accuracy, and the desired degree of user control. These
+patterns are not mutually exclusive and can often be combined within a
+single agentic application to create a robust and reliable system.</p>
+<h3
+id="implementing-hitl-in-your-agentic-applications-with-block-diagram">Implementing
+HITL in Your Agentic Applications (with Block Diagram)</h3>
+<p>Successfully implementing Human-in-the-Loop workflows in agentic
+applications requires careful architectural considerations to ensure
+seamless collaboration between the LLM agent and human reviewers or
+operators.</p>
+<h4 class="unnumbered" id="architectural-considerations">Architectural
+Considerations</h4>
+<ul>
+<li><p><strong>Explicit Pause/Interrupt Points:</strong> The agent’s
+workflow must be designed with clearly defined points where execution
+can be paused to await human input or approval. This often involves
+using specific mechanisms provided by agent frameworks (like
+<code>LangGraph</code>’s <code>interrupt()</code> function) or custom
+logic.</p></li>
+<li><p><strong>State Persistence:</strong> When an agent pauses, its
+current state—including the task context, conversation history, any
+intermediate results, and the proposed action or data needing
+review—must be reliably persisted. This is crucial because human review
+might not be instantaneous; it could take minutes, hours, or even days.
+Durable Objects or similar database solutions can be used for
+this.</p></li>
+<li><p><strong>Human Review Interface (UI/UX):</strong> A well-designed
+user interface is needed for human reviewers. This interface should
+clearly present:</p>
+<ul>
+<li><p>The context of the task.</p></li>
+<li><p>The agent’s proposed action or the data requiring
+review.</p></li>
+<li><p>Any relevant supporting information or the agent’s reasoning (if
+available).</p></li>
+<li><p>Clear options for the human to approve, reject, edit, or provide
+feedback.</p></li>
+</ul></li>
+<li><p><strong>Resumption Logic:</strong> Once human input is provided,
+the system must be able to resume the agent’s workflow, incorporating
+the human’s decision or feedback into the agent’s state.</p></li>
+<li><p><strong>Logging and Auditing:</strong> All HITL interactions,
+including what was presented to the human, the human’s input, and the
+timestamp, should be logged for auditing, traceability, and potential
+analysis for system improvement.</p></li>
+<li><p><strong>Error Handling and Timeouts:</strong> The system should
+gracefully handle scenarios like reviewer unavailability or timeouts for
+review, potentially with escalation paths or default actions.</p></li>
+</ul>
+<h4 class="unnumbered"
+id="generic-block-diagram-for-an-hitl-system-in-an-llm-agent">Generic
+Block Diagram for an HITL System in an LLM Agent</h4>
+<p>The following diagram illustrates a conceptual workflow for an LLM
+agent incorporating a Human-in-the-Loop checkpoint:</p>
+<figure id="fig:hitl_system">
+<img src="diagrams/hitl_system.png" />
+<figcaption>Block Diagram of an HITL System in an LLM Agent</figcaption>
+</figure>
+<h4 class="unnumbered" id="explanation-of-diagram-2">Explanation of
+Diagram</h4>
+<ul>
+<li><p><strong>User Request:</strong> The process starts with a request
+or goal provided to the LLM Agent Core.</p></li>
+<li><p><strong>Agent Processing:</strong> The agent engages in its
+typical cycle of planning, reasoning, and tool use.</p></li>
+<li><p><strong>Decision Point / Confidence Check:</strong> At certain
+pre-defined points in its workflow, or when its confidence in a decision
+or action is below a threshold, the agent reaches a Decision
+Point.</p></li>
+<li><p><strong>Autonomous Path:</strong> If confidence is high and the
+risk is low (or no HITL trigger is met), the agent proceeds to Execute
+Action / Finalize Output and then provides the output to the
+user.</p></li>
+<li><p><strong>HITL Path:</strong> If confidence is low, risk is high,
+or a specific HITL trigger is activated, the agent’s current operation
+is Paused, and its State is Persisted.</p></li>
+<li><p><strong>Human Review Interface:</strong> The relevant information
+(context, proposed action, agent’s reasoning if available) is presented
+to a human reviewer through a dedicated Human Review Interface.</p></li>
+<li><p><strong>Human Input:</strong> The human reviewer provides input
+(e.g., approves, edits, rejects the proposed action, or provides
+clarifying feedback).</p></li>
+<li><p><strong>Resume Agent Logic:</strong> The agent’s workflow is
+resumed. Based on the human’s input:</p>
+<ul>
+<li><p>If approved or edited, the agent may proceed to Execute Action /
+Finalize Output.</p></li>
+<li><p>If rejected or if significant re-planning is needed, the agent
+might loop back to its LLM Agent Core to reconsider its plan with the
+new human feedback.</p></li>
+</ul></li>
+<li><p><strong>Feedback Collection:</strong> The human’s feedback can
+also be systematically collected and stored.</p></li>
+<li><p><strong>Agent Learning &amp; Fine-tuning:</strong> This collected
+feedback can be used in an offline process to fine-tune the LLM, improve
+prompts, or refine tool usage, leading to continuous improvement of the
+agent.</p></li>
+</ul>
+<p>Implementing HITL effectively is more than just adding a conditional
+check for human review. It requires thoughtful design of the agent’s
+state management, task queuing mechanisms (if reviews are asynchronous),
+and user interfaces to ensure a productive and seamless collaboration
+between human intelligence and AI capabilities. This approach is
+fundamental to building agentic systems that are not only powerful but
+also safe, reliable, and aligned with enterprise requirements.</p>
+<h1 id="conclusion-and-future-directions"> Conclusion and Future
+Directions</h1>
+<h2 id="the-evolving-landscape-of-agentic-ai">The Evolving Landscape of
+Agentic AI</h2>
+<p>This concluding chapter summarizes the key takeaways for software
+engineers, examines the current challenges and limitations in building
+and deploying agentic systems, looks towards future trends including the
+concept of an "Open Agentic Web," and reiterates the critical importance
+of ethical considerations in this domain.</p>
+<h3 id="summary-of-key-learnings">Summary of Key Learnings</h3>
+<p>Throughout this book, we have explored several foundational concepts
+essential for software engineers working with or looking to integrate
+LLM-based agentic systems:</p>
+<ul>
+<li><p><strong>LLMs as Engines:</strong> Large Language Models, powered
+by Transformer architectures, are sophisticated pattern-matching and
+text-generation engines. They operate probabilistically, excelling at
+tasks requiring language understanding, generation, and reasoning, but
+are not sources of absolute truth and require careful handling of their
+outputs. Understanding concepts like tokenization, parameters, and
+temperature is key to controlling their behavior.</p></li>
+<li><p><strong>Tool Use Extends Capabilities:</strong> LLMs can overcome
+their inherent limitations (knowledge cutoffs, inability to perform
+external actions) by using "tools" via function calling. This allows
+them to interact with external APIs, databases, and other software,
+making them vastly more practical for real-world applications.</p></li>
+<li><p><strong>LLM Agents as Autonomous Problem Solvers:</strong> Agents
+leverage LLMs as their core reasoning engine, combined with memory,
+planning capabilities, and tool use, to autonomously pursue complex,
+multi-step goals. This represents a shift from single-turn interactions
+to stateful, goal-directed processes.</p></li>
+<li><p><strong>MCP for Standardized Agent-Tool Interaction:</strong> The
+Model Context Protocol (MCP) addresses the "M×N" integration problem by
+providing a universal, open standard for how LLM agents discover and
+interact with tools and data sources. It promotes modularity,
+interoperability, and security in agent-tool communication.</p></li>
+<li><p><strong>A2A for Collaborative AI:</strong> The Agent-to-Agent
+(A2A) protocol aims to standardize communication between different AI
+agents, enabling them to collaborate on tasks that may be too complex or
+diverse for a single agent. This fosters the development of multi-agent
+ecosystems.</p></li>
+<li><p><strong>FastAPI for Implementation:</strong> Python frameworks
+like FastAPI, often augmented with libraries such as FastAPI-MCP or
+FastMCP, provide a robust and developer-friendly platform for building
+the server-side components of MCP and A2A services.</p></li>
+<li><p><strong>HITL for Reliability and Control:</strong>
+Human-in-the-Loop (HITL) workflows are crucial for ensuring the safety,
+accuracy, and reliability of agentic systems, especially in critical
+applications. HITL allows human judgment to oversee, validate, and
+correct agent actions.</p></li>
+</ul>
+<p>For software engineers, these concepts are not just theoretical; they
+are practical building blocks for designing and implementing a new
+generation of intelligent software. The focus shifts from writing
+explicit, deterministic code for every scenario to designing systems
+that can leverage the reasoning and adaptive capabilities of LLMs while
+ensuring control and reliability through well-defined interfaces and
+human oversight.</p>
+<h3 id="current-challenges-and-limitations-in-agentic-systems">Current
+Challenges and Limitations in Agentic Systems</h3>
+<p>Despite the rapid advancements, the development and deployment of
+LLM-based agentic systems face several significant challenges and
+limitations that software engineers must navigate:</p>
+<ul>
+<li><p><strong>Reliability and Consistency (LLM "Flakiness"):</strong>
+LLMs can sometimes produce inconsistent or unexpected outputs even for
+similar inputs due to their probabilistic nature and sensitivity to
+prompt phrasing. Ensuring that an agent consistently performs tasks
+correctly and reliably, especially over long, multi-step interactions,
+remains a challenge. Non-determinism can make debugging and guaranteeing
+specific outcomes difficult.</p></li>
+<li><p><strong>Evaluation:</strong> Robustly evaluating the performance
+of complex, multi-step agentic systems is hard. Traditional software
+testing metrics often don’t capture the nuances of an agent’s reasoning,
+planning, and tool use. Developing comprehensive evaluation frameworks
+that can assess not just the final output but also the quality of the
+intermediate steps is an ongoing area of research.</p></li>
+<li><p><strong>Debugging Complexity:</strong> When an agent makes an
+error or behaves unexpectedly, tracing the root cause can be difficult
+due to the "black box" nature of LLM decision-making and the potentially
+long chain of LLM calls, tool interactions, and state changes. This is
+compounded in multi-agent systems where interactions between agents add
+another layer of complexity.</p></li>
+<li><p><strong>Cost Management:</strong> Agentic systems, especially
+those involving multiple LLM calls in a loop or interactions with
+multiple specialized models, can incur significant computational costs.
+Each LLM call consumes tokens, and running inference on large models
+requires powerful (and expensive) GPU resources. Optimizing prompts,
+caching results, and choosing appropriate models for sub-tasks are
+crucial for cost control.</p></li>
+<li><p><strong>Security Vulnerabilities:</strong></p>
+<ul>
+<li><p><strong>Prompt Injection:</strong> Maliciously crafted inputs can
+trick the LLM into ignoring its original instructions or performing
+unintended actions, including misusing tools.</p></li>
+<li><p><strong>Tool Misuse and Data Leakage:</strong> If an agent has
+access to powerful tools or sensitive data, vulnerabilities in its logic
+or security measures can lead to unauthorized actions or data
+breaches.</p></li>
+<li><p><strong>Insecure MCP/A2A Implementations:</strong> Poorly secured
+MCP servers or A2A endpoints could expose tools and data to unauthorized
+access or manipulation.</p></li>
+</ul></li>
+<li><p><strong>Scalability of Infrastructure:</strong> As the number of
+agents and the complexity of their interactions grow, scaling the
+underlying infrastructure for MCP/A2A communication, state management,
+and LLM inference becomes a challenge.</p></li>
+<li><p><strong>Context Window Limitations and Long-Term
+Planning:</strong> While modern LLMs have increasingly large context
+windows, agents can still struggle with tasks that require maintaining
+coherent context over extremely long interactions or performing very
+complex, extended planning.</p></li>
+<li><p><strong>Standardization and Interoperability:</strong> While MCP
+and A2A are steps towards standardization, the agentic AI field is still
+young. Ensuring true interoperability between agents and tools from
+different vendors and frameworks will require continued effort and
+adoption of these (and potentially other) open standards.</p></li>
+</ul>
+<p>Many of these challenges are not solely about improving the LLM
+models themselves, but rather about establishing robust software
+engineering practices, architectural patterns, and infrastructure around
+them. The inherent uncertainties and complexities of LLM-driven systems
+require new approaches to testing, debugging, monitoring, and security.
+Protocols like MCP and A2A aim to provide some of the necessary
+standardization that can help in building more observable, manageable,
+and secure agentic systems, but the practical engineering of these
+systems is still an evolving discipline.</p>
+<h3 id="future-trends-the-open-agentic-web-and-beyond">Future Trends:
+The Open Agentic Web and Beyond</h3>
+<p>The field of LLM agents and agentic AI is dynamic, with several key
+trends pointing towards an increasingly interconnected and capable
+future:</p>
+<ul>
+<li><p><strong>Increased Autonomy and Capability:</strong> Agents are
+expected to become more proactive, capable of initiating tasks, learning
+from their experiences with less supervision, and handling more complex,
+longer-running objectives with greater autonomy. This includes better
+dynamic task decomposition and adaptation to unforeseen
+circumstances.</p></li>
+<li><p><strong>Multi-Agent Collaboration as a Norm:</strong> Protocols
+like A2A are paving the way for ecosystems of interoperable, specialized
+agents that can collaborate to solve problems beyond the scope of any
+single agent. This leads to the concept of an "Open Agentic Web", where
+AI agents, much like web services today, can discover, communicate, and
+coordinate with each other across the internet or within enterprise
+networks to perform tasks on behalf of users or organizations.</p></li>
+<li><p><strong>Improved Frameworks and Tooling:</strong> The development
+frameworks and SDKs for building agents (e.g., LangChain, LlamaIndex,
+CrewAI, Semantic Kernel, AutoGen, and specific SDKs for MCP and A2A)
+will continue to mature, offering more sophisticated abstractions,
+pre-built components, and better support for debugging, evaluation, and
+deployment.</p></li>
+<li><p><strong>Enhanced Reasoning and Planning:</strong> Advances in LLM
+architectures, training methodologies (like improved reinforcement
+learning techniques), and prompting strategies will lead to agents with
+more robust and nuanced reasoning and planning capabilities. This could
+include better handling of uncertainty, more effective exploration of
+solution spaces, and more reliable long-term strategic
+thinking.</p></li>
+<li><p><strong>Closer Human-AI Collaboration:</strong> HITL patterns
+will become more sophisticated, with more intuitive interfaces and
+tighter feedback loops, enabling more fluid and effective collaboration
+between humans and AI agents. Agents may become better at understanding
+when to ask for help and how to incorporate human guidance.</p></li>
+<li><p><strong>Standardization Efforts and Ecosystem Growth:</strong>
+The adoption and evolution of open standards like MCP and A2A will be
+crucial. As these protocols gain traction, we can expect to see richer
+marketplaces of MCP-compliant tools and A2A-compatible agents, lowering
+the barrier to entry for building complex agentic systems. Future
+versions may include enhanced security features, support for federated
+learning, and more efficient communication mechanisms.</p></li>
+<li><p><strong>Multimodal Agents:</strong> Agents will increasingly be
+able to process and generate information across multiple modalities
+(text, images, audio, video), making them more versatile and capable of
+interacting with the world in richer ways.</p></li>
+</ul>
+<p>The vision of an "Open Agentic Web" suggests a significant paradigm
+shift for software development. In such a future, building applications
+might increasingly involve orchestrating and composing autonomous agents
+from various providers, much like current web development relies on
+consuming APIs from different services. This would necessitate robust
+mechanisms for agent discovery (e.g., enhanced Agent Cards for A2A),
+dynamic capability negotiation, fine-grained security controls, and new
+models for trust and governance in distributed AI systems. For software
+engineers, this implies a future where skills in system integration,
+distributed computing, and understanding AI behavior will be even more
+critical.</p>
+<h3
+id="ethical-considerations-and-best-practices-for-responsible-development">Ethical
+Considerations and Best Practices for Responsible Development</h3>
+<p>As LLM agents become more autonomous, capable, and integrated into
+critical aspects of business and society, the ethical implications of
+their development and deployment become increasingly important. Software
+engineers building these systems have a responsibility to consider these
+issues proactively.</p>
+<ul>
+<li><p><strong>Bias and Fairness:</strong> Agents can inherit and
+amplify biases present in their LLM’s training data or in the data
+provided by the tools they use. This can lead to unfair or
+discriminatory outcomes in areas like hiring, loan applications, or
+content moderation.</p>
+<p><strong>Best Practice:</strong> Regularly audit training data and
+agent outputs for bias. Strive for diverse development teams to identify
+potential blind spots. Implement fairness metrics and test agent
+behavior across different demographic groups.</p></li>
+<li><p><strong>Transparency and Explainability:</strong> The
+decision-making processes of LLM agents, especially those involving
+complex reasoning or multiple tool uses, can be opaque. Lack of
+transparency makes it difficult to understand why an agent made a
+particular decision, to debug errors, or to assign accountability.</p>
+<p><strong>Best Practice:</strong> Design agents to log their reasoning
+steps, tool invocations, and key decision points. Explore techniques for
+generating explanations of agent behavior. Clearly communicate to users
+when they are interacting with an AI agent.</p></li>
+</ul>
+<div class="refsection">
+
+</div>
+<div id="refs" class="references csl-bib-body hanging-indent"
+role="list">
+<div id="ref-softwareag2025llmtool" class="csl-entry" role="listitem">
+AG, Software. n.d. <span>“LLM Tool Usage &amp; API Integration.”</span>
+<a
+href="https://www.softwareag.com/en_corporate/blog/llm-tool-usage.html">https://www.softwareag.com/en_corporate/blog/llm-tool-usage.html</a>.
+</div>
+<div id="ref-apideck2025llmtool" class="csl-entry" role="listitem">
+Apideck. n.d. <span>“An Introduction to Function Calling and Tool
+Use.”</span> <a
+href="https://www.apideck.com/blog/llm-tool-use-and-function-calling">https://www.apideck.com/blog/llm-tool-use-and-function-calling</a>.
+</div>
+<div id="ref-arisegtm2025mcp" class="csl-entry" role="listitem">
+AriseGTM. n.d. <span>“How MCP and A2A Protocols Are Changing Enterprise
+GTM.”</span> <a
+href="https://arisegtm.com/blog/how-mcp-and-a2a-protocols-are-changing-enterprise-gtm">https://arisegtm.com/blog/how-mcp-and-a2a-protocols-are-changing-enterprise-gtm</a>.
+</div>
+<div id="ref-arsturn2025mcp" class="csl-entry" role="listitem">
+Arsturn. n.d. <span>“Exploring the Integration of MCP Servers with
+External APIs and Services.”</span> <a
+href="https://www.arsturn.com/blog/exploring-the-integration-of-mcp-servers-with-external-apis-and-services">https://www.arsturn.com/blog/exploring-the-integration-of-mcp-servers-with-external-apis-and-services</a>.
+</div>
+<div id="ref-arxiv2025agentic" class="csl-entry" role="listitem">
+arXiv. n.d.a. <span>“Arxiv.org.”</span> <a
+href="https://arxiv.org/pdf/2506.01804">https://arxiv.org/pdf/2506.01804</a>.
+</div>
+<div id="ref-arxiv2025transformer" class="csl-entry" role="listitem">
+———. n.d.b. <span>“Transformer Models: An Introduction and
+Catalog.”</span> <a
+href="https://arxiv.org/html/2302.07730v4">https://arxiv.org/html/2302.07730v4</a>.
+</div>
+<div id="ref-auxiliobits2025ethics" class="csl-entry" role="listitem">
+Auxiliobits. n.d. <span>“Ethics of Autonomous AI Agents: Risks,
+Challenges, Tips.”</span> <a
+href="https://www.auxiliobits.com/the-ethics-of-autonomous-ai-agents-risks-challenges-and-tips/">https://www.auxiliobits.com/the-ethics-of-autonomous-ai-agents-risks-challenges-and-tips/</a>.
+</div>
+<div id="ref-aws2025transformers" class="csl-entry" role="listitem">
+AWS. n.d. <span>“What Are Transformers in Artificial
+Intelligence?”</span> <a
+href="https://aws.amazon.com/what-is/transformers-in-artificial-intelligence/">https://aws.amazon.com/what-is/transformers-in-artificial-intelligence/</a>.
+</div>
+<div id="ref-balbix2025llm" class="csl-entry" role="listitem">
+Balbix. n.d. <span>“Guide to Large Language Models (LLMs)
+Explained.”</span> <a
+href="https://www.balbix.com/insights/what-is-large-language-model-llm/">https://www.balbix.com/insights/what-is-large-language-model-llm/</a>.
+</div>
+<div id="ref-n8n2025agents" class="csl-entry" role="listitem">
+Blog, n8n. n.d. <span>“Your Practical Guide to LLM Agents in 2025 (+ 5
+Templates for Automation).”</span> <a
+href="https://blog.n8n.io/llm-agents/">https://blog.n8n.io/llm-agents/</a>.
+</div>
+<div id="ref-botpress2025guide" class="csl-entry" role="listitem">
+Botpress. n.d. <span>“Complete Guide to LLM Agents (2025).”</span> <a
+href="https://botpress.com/blog/llm-agents">https://botpress.com/blog/llm-agents</a>.
+</div>
+<div id="ref-byteplus2025a2a" class="csl-entry" role="listitem">
+BytePlus. n.d. <span>“A2A Protocol System Architecture Diagrams
+Explained.”</span> <a
+href="https://www.byteplus.com/en/topic/551240">https://www.byteplus.com/en/topic/551240</a>.
+</div>
+<div id="ref-cloudx2025concepts" class="csl-entry" role="listitem">
+CloudX. n.d. <span>“How Do LLMs Work? Key Concepts of Generative
+AI.”</span> <a
+href="https://cloudx.com/blog/how-do-large-language-models-work-key-concepts-of-generative-ai-you-should-know">https://cloudx.com/blog/how-do-large-language-models-work-key-concepts-of-generative-ai-you-should-know</a>.
+</div>
+<div id="ref-poloclub2025transformer" class="csl-entry" role="listitem">
+Club, Polo. n.d. <span>“Transformer Explainer: LLM Transformer Model
+Visually Explained.”</span> <a
+href="https://poloclub.github.io/transformer-explainer/">https://poloclub.github.io/transformer-explainer/</a>.
+</div>
+<div id="ref-google2025codelabs" class="csl-entry" role="listitem">
+Codelabs, Google. n.d. <span>“Getting Started with Agent-to-Agent (A2A)
+Protocol: A Purchasing Concierge and Remote Seller Agent Interactions
+with Gemini on Cloud Run.”</span> <a
+href="https://codelabs.developers.google.com/intro-a2a-purchasing-concierge">https://codelabs.developers.google.com/intro-a2a-purchasing-concierge</a>.
+</div>
+<div id="ref-github2025mcp" class="csl-entry" role="listitem">
+Cyanheads. n.d. <span>“Model Context Protocol Resources.”</span> <a
+href="https://github.com/cyanheads/model-context-protocol-resources">https://github.com/cyanheads/model-context-protocol-resources</a>.
+</div>
+<div id="ref-montecarlodata2025mcp" class="csl-entry" role="listitem">
+Data, Monte Carlo. n.d. <span>“What Is Model Context Protocol (MCP)? A
+Quick Start Guide.”</span> <a
+href="https://www.montecarlodata.com/blog-model-context-protocol-mcp">https://www.montecarlodata.com/blog-model-context-protocol-mcp</a>.
+</div>
+<div id="ref-databricks2025inference" class="csl-entry" role="listitem">
+Databricks. n.d. <span>“LLM Inference Performance Engineering: Best
+Practices.”</span> <a
+href="https://www.databricks.com/blog/llm-inference-performance-engineering-best-practices">https://www.databricks.com/blog/llm-inference-performance-engineering-best-practices</a>.
+</div>
+<div id="ref-deepchecks2025parameters" class="csl-entry"
+role="listitem">
+Deepchecks. n.d. <span>“What Are LLM Parameters? Explained
+Simply.”</span> <a
+href="https://www.deepchecks.com/glossary/llm-parameters/">https://www.deepchecks.com/glossary/llm-parameters/</a>.
+</div>
+<div id="ref-deepset2025mcp" class="csl-entry" role="listitem">
+deepset. n.d. <span>“Understanding the Model Context Protocol
+(MCP).”</span> <a
+href="https://www.deepset.ai/blog/understanding-the-model-context-protocol-mcp">https://www.deepset.ai/blog/understanding-the-model-context-protocol-mcp</a>.
+</div>
+<div id="ref-googledevelopers2025a2a" class="csl-entry" role="listitem">
+Developers, Google. n.d.a. <span>“Announcing the Agent2Agent Protocol
+(A2A).”</span> <a
+href="https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/">https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/</a>.
+</div>
+<div id="ref-google2025llmintro" class="csl-entry" role="listitem">
+———. n.d.b. <span>“Introduction to Large Language Models.”</span> <a
+href="https://developers.google.com/machine-learning/resources/intro-llms">https://developers.google.com/machine-learning/resources/intro-llms</a>.
+</div>
+<div id="ref-docker2025mcp" class="csl-entry" role="listitem">
+docker. n.d. <span>“Docker/Mcp-Servers: Model Context Protocol
+Servers.”</span> <a
+href="https://github.com/docker/mcp-servers">https://github.com/docker/mcp-servers</a>.
+</div>
+<div id="ref-dynatrace2025agentic" class="csl-entry" role="listitem">
+Dynatrace. n.d. <span>“The Rise of Agentic AI Part 1: Understanding MCP,
+A2A, and the Future of Automation.”</span> <a
+href="https://www.dynatrace.com/news/blog/agentic-ai-how-mcp-and-ai-agents-drive-the-latest-automation-revolution/">https://www.dynatrace.com/news/blog/agentic-ai-how-mcp-and-ai-agents-drive-the-latest-automation-revolution/</a>.
+</div>
+<div id="ref-dtstechfitedu2025impact" class="csl-entry" role="listitem">
+EDU, DTS Tech Fit. n.d. <span>“A New Era in AI Agent Collaboration: The
+Impact of MCP and A2A on Software Interaction.”</span> <a
+href="https://www.dtstechfitedu.com/post/how-google-anthropic-just-changed-the-future-with-mcp-and-a2a">https://www.dtstechfitedu.com/post/how-google-anthropic-just-changed-the-future-with-mcp-and-a2a</a>.
+</div>
+<div id="ref-huggingface2025agents" class="csl-entry" role="listitem">
+Face, Hugging. n.d.a. <span>“Agents Documentation.”</span> <a
+href="https://huggingface.co/docs/transformers/agents">https://huggingface.co/docs/transformers/agents</a>.
+</div>
+<div id="ref-huggingface2025transformerswork" class="csl-entry"
+role="listitem">
+———. n.d.b. <span>“How Do Transformers Work? - Hugging Face LLM
+Course.”</span> <a
+href="https://huggingface.co/learn/llm-course/chapter1/4">https://huggingface.co/learn/llm-course/chapter1/4</a>.
+</div>
+<div id="ref-huggingface2025llmcourse" class="csl-entry"
+role="listitem">
+———. n.d.c. <span>“Natural Language Processing and Large Language Models
+- Hugging Face LLM Course.”</span> <a
+href="https://huggingface.co/learn/llm-course/chapter1/2">https://huggingface.co/learn/llm-course/chapter1/2</a>.
+</div>
+<div id="ref-huggingface2025llms" class="csl-entry" role="listitem">
+———. n.d.d. <span>“What Are LLMs? - Hugging Face Agents Course.”</span>
+<a
+href="https://huggingface.co/learn/agents-course/unit1/what-are-llms">https://huggingface.co/learn/agents-course/unit1/what-are-llms</a>.
+</div>
+<div id="ref-martinfowler2025function" class="csl-entry"
+role="listitem">
+Fowler, Martin. n.d. <span>“Function Calling Using LLMs.”</span> <a
+href="https://martinfowler.com/articles/function-call-LLM.html">https://martinfowler.com/articles/function-call-LLM.html</a>.
+</div>
+<div id="ref-geeksforgeeks2025transformers" class="csl-entry"
+role="listitem">
+GeeksforGeeks. n.d. <span>“Transformers in Machine Learning.”</span> <a
+href="https://www.geeksforgeeks.org/getting-started-with-transformers/">https://www.geeksforgeeks.org/getting-started-with-transformers/</a>.
+</div>
+<div id="ref-getstream2025agent2agent" class="csl-entry"
+role="listitem">
+GetStream. n.d. <span>“LLM Context Protocols: Agent2Agent Vs.
+MCP.”</span> <a
+href="https://getstream.io/blog/agent2agent-vs-mcp/">https://getstream.io/blog/agent2agent-vs-mcp/</a>.
+</div>
+<div id="ref-seangoedecke2025how" class="csl-entry" role="listitem">
+goedecke, Sean. n.d. <span>“How i Use LLMs as a Staff Engineer.”</span>
+<a
+href="https://www.seangoedecke.com/how-i-use-llms/">https://www.seangoedecke.com/how-i-use-llms/</a>.
+</div>
+<div id="ref-google2025a2a" class="csl-entry" role="listitem">
+Google. n.d.a. <span>“Google-A2a/A2A: An Open Protocol Enabling
+...”</span> <a
+href="https://github.com/google-a2a/A2A">https://github.com/google-a2a/A2A</a>.
+</div>
+<div id="ref-google2025a2aserver" class="csl-entry" role="listitem">
+———. n.d.b. <span>“Interact with Server - Agent2Agent Protocol
+(A2A).”</span> <a
+href="https://google.github.io/A2A/tutorials/python/6-interact-with-server/">https://google.github.io/A2A/tutorials/python/6-interact-with-server/</a>.
+</div>
+<div id="ref-promptingguide2025function" class="csl-entry"
+role="listitem">
+Guide, Prompting. n.d. <span>“Function Calling with LLMs - Prompt
+Engineering Guide.”</span> <a
+href="https://www.promptingguide.ai/applications/function_calling">https://www.promptingguide.ai/applications/function_calling</a>.
+</div>
+<div id="ref-redhat2025mcp" class="csl-entry" role="listitem">
+Hat, Red. n.d. <span>“Model Context Protocol: Discover the Missing Link
+in AI Integration.”</span> <a
+href="https://www.redhat.com/en/blog/model-context-protocol-discover-missing-link-ai-integration">https://www.redhat.com/en/blog/model-context-protocol-discover-missing-link-ai-integration</a>.
+</div>
+<div id="ref-hopsworks2025function" class="csl-entry" role="listitem">
+Hopsworks. n.d. <span>“What Is Function Calling with LLMs?”</span> <a
+href="https://www.hopsworks.ai/dictionary/function-calling-with-llms">https://www.hopsworks.ai/dictionary/function-calling-with-llms</a>.
+</div>
+<div id="ref-humanloop2025mcp" class="csl-entry" role="listitem">
+Humanloop. n.d. <span>“Model Context Protocol (MCP) Explained.”</span>
+<a
+href="https://humanloop.com/blog/mcp">https://humanloop.com/blog/mcp</a>.
+</div>
+<div id="ref-hyperight2025llms" class="csl-entry" role="listitem">
+Hyperight. n.d. <span>“Large Language Models: How to Run LLMs on a
+Single GPU.”</span> <a
+href="https://hyperight.com/large-language-models-how-to-run-llms-on-a-single-gpu/">https://hyperight.com/large-language-models-how-to-run-llms-on-a-single-gpu/</a>.
+</div>
+<div id="ref-ibm2025mcp" class="csl-entry" role="listitem">
+IBM. n.d. <span>“What Is Model Context Protocol (MCP)?”</span> <a
+href="https://www.ibm.com/think/topics/model-context-protocol">https://www.ibm.com/think/topics/model-context-protocol</a>.
+</div>
+<div id="ref-complereinfosystem2025integrate" class="csl-entry"
+role="listitem">
+Infosystem, Complere. n.d. <span>“Integrating Large Language Models with
+External Tools: A Practical Guide to API Function Calls.”</span> <a
+href="https://complereinfosystem.com/integrate-large-language-models-with-external-tools">https://complereinfosystem.com/integrate-large-language-models-with-external-tools</a>.
+</div>
+<div id="ref-jlowin2025fastmcp" class="csl-entry" role="listitem">
+jlowin. n.d. <span>“Jlowin/Fastmcp: The Fast, Pythonic Way to Build MCP
+Servers ...”</span> <a
+href="https://github.com/jlowin/fastmcp">https://github.com/jlowin/fastmcp</a>.
+</div>
+<div id="ref-k2view2025llm" class="csl-entry" role="listitem">
+K2view. n.d. <span>“What Are LLM Agents? A Practical Guide.”</span> <a
+href="https://www.k2view.com/what-are-llm-agents/">https://www.k2view.com/what-are-llm-agents/</a>.
+</div>
+<div id="ref-langchain2025agents" class="csl-entry" role="listitem">
+LangChain. n.d. <span>“LangChain Agents Documentation.”</span> <a
+href="https://python.langchain.com/api_reference/langchain/agents.html">https://python.langchain.com/api_reference/langchain/agents.html</a>.
+</div>
+<div id="ref-mbzuai2025llms" class="csl-entry" role="listitem">
+MBZUAI. n.d. <span>“LLMs 101: Large Language Models Explained.”</span>
+<a
+href="https://mbzuai.ac.ae/news/llms-101-large-language-models-explained/">https://mbzuai.ac.ae/news/llms-101-large-language-models-explained/</a>.
+</div>
+<div id="ref-moveworks2025agentic" class="csl-entry" role="listitem">
+MoveWorks. n.d. <span>“Agentic Frameworks: A Guide to the Systems Used
+to Build AI ...”</span> <a
+href="https://www.moveworks.com/us/en/resources/blog/what-is-agentic-framework">https://www.moveworks.com/us/en/resources/blog/what-is-agentic-framework</a>.
+</div>
+<div id="ref-nebius2025mcp" class="csl-entry" role="listitem">
+Nebius. n.d. <span>“Understanding the Model Context Protocol (MCP):
+Architecture.”</span> <a
+href="https://nebius.com/blog/posts/understanding-model-context-protocol-mcp-architecture">https://nebius.com/blog/posts/understanding-model-context-protocol-mcp-architecture</a>.
+</div>
+<div id="ref-nvidia2025autonomous" class="csl-entry" role="listitem">
+NVIDIA. n.d.a. <span>“An Easy Introduction to LLM Reasoning, AI Agents,
+and Test Time ...”</span> <a
+href="https://developer.nvidia.com/blog/an-easy-introduction-to-llm-reasoning-ai-agents-and-test-time-scaling/">https://developer.nvidia.com/blog/an-easy-introduction-to-llm-reasoning-ai-agents-and-test-time-scaling/</a>.
+</div>
+<div id="ref-nvidia2025intro" class="csl-entry" role="listitem">
+———. n.d.b. <span>“Introduction to Large Language Models (LLMs).”</span>
+<a
+href="https://resources.nvidia.com/en-us-dgx-h100-nemo/large-language-models-intro-blog">https://resources.nvidia.com/en-us-dgx-h100-nemo/large-language-models-intro-blog</a>.
+</div>
+<div id="ref-nvidia2025uses" class="csl-entry" role="listitem">
+———. n.d.c. <span>“What Are Large Language Models Used For?”</span> <a
+href="https://blogs.nvidia.com/blog/what-are-large-language-models-used-for/">https://blogs.nvidia.com/blog/what-are-large-language-models-used-for/</a>.
+</div>
+<div id="ref-openai2025mcp" class="csl-entry" role="listitem">
+OpenAI. n.d. <span>“Model Context Protocol (MCP) - OpenAI Agents
+SDK.”</span> <a
+href="https://openai.github.io/openai-agents-python/mcp/">https://openai.github.io/openai-agents-python/mcp/</a>.
+</div>
+<div id="ref-opencv2025mcp" class="csl-entry" role="listitem">
+OpenCV. n.d. <span>“A Beginners Guide on Model Context Protocol
+(MCP).”</span> <a
+href="https://opencv.org/blog/model-context-protocol/">https://opencv.org/blog/model-context-protocol/</a>.
+</div>
+<div id="ref-origo2025protocol" class="csl-entry" role="listitem">
+Origo. n.d. <span>“The Protocol LLM Agents Need to Finally Talk to Each
+Other.”</span> <a
+href="https://origo.prose.sh/agent-to-agent">https://origo.prose.sh/agent-to-agent</a>.
+</div>
+<div id="ref-modelcontextprotocol2025architecture" class="csl-entry"
+role="listitem">
+Protocol, Model Context. n.d.a. <span>“Core Architecture - Model Context
+Protocol.”</span> <a
+href="https://modelcontextprotocol.io/docs/concepts/architecture">https://modelcontextprotocol.io/docs/concepts/architecture</a>.
+</div>
+<div id="ref-modelcontextprotocol2025examples" class="csl-entry"
+role="listitem">
+———. n.d.b. <span>“Example Servers - Model Context Protocol.”</span> <a
+href="https://modelcontextprotocol.io/examples">https://modelcontextprotocol.io/examples</a>.
+</div>
+<div id="ref-mcp2025spec" class="csl-entry" role="listitem">
+———. n.d.c. <span>“Specification - Model Context Protocol.”</span> <a
+href="https://modelcontextprotocol.io/specification/2025-03-26">https://modelcontextprotocol.io/specification/2025-03-26</a>.
+</div>
+<div id="ref-philschmid2025mcp" class="csl-entry" role="listitem">
+Schmid, Phil. n.d. <span>“Model Context Protocol (MCP) an
+Overview.”</span> <a
+href="https://www.philschmid.de/mcp-introduction">https://www.philschmid.de/mcp-introduction</a>.
+</div>
+<div id="ref-scrapfly2025guide" class="csl-entry" role="listitem">
+Scrapfly. n.d. <span>“Guide to Understanding and Developing LLM
+Agents.”</span> <a
+href="https://scrapfly.io/blog/practical-guide-to-llm-agents/">https://scrapfly.io/blog/practical-guide-to-llm-agents/</a>.
+</div>
+<div id="ref-dev2025mcp" class="csl-entry" role="listitem">
+shrsv. n.d. <span>“My Notes on Model Context Protocol Architecture: A
+Developer’s Dive.”</span> <a
+href="https://dev.to/shrsv/my-notes-on-model-context-protocol-architecture-a-developers-dive-j2">https://dev.to/shrsv/my-notes-on-model-context-protocol-architecture-a-developers-dive-j2</a>.
+</div>
+<div id="ref-samsolutions2025mcp" class="csl-entry" role="listitem">
+Solutions, SaM. n.d. <span>“Model Context Protocol (MCP): Meaning,
+Examples.”</span> <a
+href="https://sam-solutions.com/blog/model-context-protocol/">https://sam-solutions.com/blog/model-context-protocol/</a>.
+</div>
+<div id="ref-superannotate2025agents" class="csl-entry" role="listitem">
+SuperAnnotate. n.d. <span>“LLM Agents: The Ultimate Guide 2025.”</span>
+<a
+href="https://www.superannotate.com/blog/llm-agents">https://www.superannotate.com/blog/llm-agents</a>.
+</div>
+<div id="ref-symflower2025dev" class="csl-entry" role="listitem">
+Symflower. n.d. <span>“An Introduction to LLM Agents for Software
+Development.”</span> <a
+href="https://symflower.com/en/company/blog/2025/using-llm-agents-for-software-development/">https://symflower.com/en/company/blog/2025/using-llm-agents-for-software-development/</a>.
+</div>
+<div id="ref-tredence2025agents" class="csl-entry" role="listitem">
+Tredence. n.d. <span>“What Is an LLM Agent? - Examples, Benefits (+
+Tools).”</span> <a
+href="https://www.tredence.com/blog/llm-agents">https://www.tredence.com/blog/llm-agents</a>.
+</div>
+<div id="ref-wikipedia2025mcp" class="csl-entry" role="listitem">
+Wikipedia. n.d. <span>“Model Context Protocol.”</span> <a
+href="https://en.wikipedia.org/wiki/Model_Context_Protocol">https://en.wikipedia.org/wiki/Model_Context_Protocol</a>.
+</div>
+<div id="ref-zapier2025a2a" class="csl-entry" role="listitem">
+Zapier. n.d. <span>“What Is the A2A Protocol?”</span> <a
+href="https://zapier.com/blog/a2a-protocol/">https://zapier.com/blog/a2a-protocol/</a>.
+</div>
+<div id="ref-zencoder2025mcp" class="csl-entry" role="listitem">
+Zencoder. n.d. <span>“Model Context Protocol (MCP) - Everything You Need
+to Know.”</span> <a
+href="https://zencoder.ai/blog/model-context-protocol">https://zencoder.ai/blog/model-context-protocol</a>.
+</div>
+</div>
+</body>
+</html>
