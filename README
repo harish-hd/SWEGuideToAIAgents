@@ -1,0 +1,30 @@
+# Software Engineer's Guide to AI Agents
+
+## Overview
+This book serves as a comprehensive guide for software engineers looking to understand and implement AI agents. 
+
+## Contents
+
+### Foundational Principles
+- Large Language Models (LLMs)
+- Core concepts: tokens, parameters, and Transformer architecture
+- Function calling and tool integration
+
+### AI Agents
+- Autonomous planning and execution
+- Tool utilization for complex goals
+- Agent architectures and implementations
+
+### Open Standards
+- Model Context Protocol (MCP) for agent-tool interaction
+- Agent-to-Agent (A2A) protocol for inter-agent communication
+- Integration patterns for agentic systems
+
+### Practical Implementation
+- FastAPI integration
+- Business service integration
+- Human-in-the-Loop (HITL) considerations
+- Real-world deployment strategies
+
+## License
+See the [LICENSE](LICENSE) file for details.
